@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "polyglossa"
+dynamic = ["version"]
+description = "English Wiktionary's languages, language families and scripts."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE", "NOTICE"]
+requires-python = ">=3.9"
+authors = [{ name = "Fenakhay" }]
+keywords = ["wiktionary", "languages", "language codes", "scripts", "linguistics"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Topic :: Text Processing :: Linguistic",
+    "Typing :: Typed",
+]
+
+[project.urls]
+Homepage = "https://github.com/fenakhay/polyglossa"
+Source = "https://github.com/fenakhay/polyglossa"
+
+[tool.setuptools.dynamic]
+version = { attr = "polyglossa._version.__version__" }
+
+[tool.setuptools.package-data]
+polyglossa = ["catalog.tsv", "py.typed"]

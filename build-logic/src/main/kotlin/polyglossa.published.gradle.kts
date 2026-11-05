@@ -1,0 +1,101 @@
+import org.gradle.api.publish.maven.MavenPublication
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
+
+plugins {
+    id("polyglossa.dokka")
+    `maven-publish`
+    signing
+    id("com.gradleup.nmcp")
+}
+
+pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
+    extensions.configure<JavaPluginExtension> { withSourcesJar() }
+
+    publishing.publications.create<MavenPublication>("maven") { from(components["java"]) }
+
+    extensions.configure<KotlinJvmProjectExtension> {
+        @OptIn(ExperimentalAbiValidation::class) abiValidation()
+    }
+}
+
+pluginManager.withPlugin("org.jetbrains.kotlin.multiplatform") {
+    extensions.configure<KotlinMultiplatformExtension> {
+        @OptIn(ExperimentalAbiValidation::class) abiValidation()
+    }
+}
+
+publishing {
+    publications.withType<MavenPublication>().configureEach {
+        val publication = name
+        val javadocJar =
+            tasks.register<Jar>("${publication}JavadocJar") {
+                group = "documentation"
+                description = "Documentation jar for the $publication publication, built from the KDoc."
+                archiveClassifier.set("javadoc")
+                archiveAppendix.set(publication)
+                destinationDirectory.set(layout.buildDirectory.dir("javadoc/$publication"))
+                from(tasks.named("dokkaGeneratePublicationHtml"))
+                exclude("dokka-configuration.json")
+            }
+        artifact(javadocJar)
+
+        pom {
+            name.set(project.name)
+            description.set(
+                "Polyglossa — English Wiktionary's languages, families and scripts for Kotlin Multiplatform (${project.name})",
+            )
+            url.set("https://github.com/fenakhay/polyglossa")
+
+            licenses {
+                license {
+                    name.set("MIT License")
+                    url.set("https://opensource.org/licenses/MIT")
+                }
+            }
+
+            developers {
+                developer {
+                    id.set("fenakhay")
+                    name.set("Fenakhay")
+                    url.set("https://github.com/fenakhay")
+                }
+            }
+
+            scm {
+                url.set("https://github.com/fenakhay/polyglossa")
+                connection.set("scm:git:https://github.com/fenakhay/polyglossa.git")
+                developerConnection.set("scm:git:ssh://git@github.com/fenakhay/polyglossa.git")
+            }
+        }
+    }
+
+    repositories {
+        val githubUser = providers.gradleProperty("gpr.user")
+            .orElse(providers.environmentVariable("GITHUB_ACTOR"))
+        val githubToken = providers.gradleProperty("gpr.token")
+            .orElse(providers.environmentVariable("GITHUB_TOKEN"))
+
+        if (githubUser.isPresent && githubToken.isPresent) {
+            maven {
+                name = "GitHubPackages"
+                url = uri("https://maven.pkg.github.com/fenakhay/polyglossa")
+                credentials {
+                    username = githubUser.get()
+                    password = githubToken.get()
+                }
+            }
+        }
+    }
+}
+
+signing {
+    val key = providers.environmentVariable("SIGNING_KEY")
+    val password = providers.environmentVariable("SIGNING_PASSWORD")
+
+    if (key.isPresent && password.isPresent) {
+        useInMemoryPgpKeys(key.get(), password.get())
+        sign(publishing.publications)
+    }
+}

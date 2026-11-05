@@ -1,0 +1,703 @@
+{
+    "date": "2026-11-05",
+    "counts": {
+        "languages": 8970,
+        "families": 1246,
+        "scripts": 233
+    },
+    "languages": [
+        {
+            "code": "en",
+            "name": "English",
+            "type": "regular",
+            "wikidata": "Q1860",
+            "family": "gmw-ang",
+            "scripts": [
+                "Latn",
+                "Brai",
+                "Shaw",
+                "Dsrt"
+            ],
+            "ancestors": [
+                "en-ear"
+            ],
+            "aliases": [
+                "Modern English",
+                "New English"
+            ],
+            "parent": null,
+            "full": "en",
+            "varieties": [
+                [
+                    "Polari"
+                ],
+                [
+                    "Yinglish"
+                ]
+            ]
+        },
+        {
+            "code": "en-ear",
+            "name": "Early Modern English",
+            "type": "etymology-only",
+            "wikidata": "Q1472196",
+            "family": "gmw-ang",
+            "scripts": [],
+            "ancestors": [
+                "enm"
+            ],
+            "aliases": [
+                "Early New English"
+            ],
+            "parent": "en",
+            "full": "en",
+            "varieties": []
+        },
+        {
+            "code": "ang",
+            "name": "Old English",
+            "type": "regular",
+            "wikidata": "Q42365",
+            "family": "gmw-ang",
+            "scripts": [
+                "Latn",
+                "Runr"
+            ],
+            "ancestors": [],
+            "aliases": [
+                "Anglo-Saxon"
+            ],
+            "parent": null,
+            "full": "ang",
+            "varieties": []
+        },
+        {
+            "code": "ine-pro",
+            "name": "Proto-Indo-European",
+            "type": "reconstructed",
+            "wikidata": "Q37178",
+            "family": "ine",
+            "scripts": [
+                "Latn"
+            ],
+            "ancestors": [],
+            "aliases": [],
+            "parent": null,
+            "full": "ine-pro",
+            "varieties": []
+        },
+        {
+            "code": "de",
+            "name": "German",
+            "type": "regular",
+            "wikidata": "Q188",
+            "family": "gmw-hgm",
+            "scripts": [
+                "Latn",
+                "Latf",
+                "Brai"
+            ],
+            "ancestors": [
+                "de-ear"
+            ],
+            "aliases": [
+                "High German",
+                "New High German",
+                "Deutsch"
+            ],
+            "parent": null,
+            "full": "de",
+            "varieties": [
+                [
+                    "Alsatian German"
+                ],
+                [
+                    "American German"
+                ],
+                [
+                    "Bavarian German"
+                ],
+                [
+                    "Belgian German"
+                ],
+                [
+                    "Central German"
+                ],
+                [
+                    "DDR German"
+                ],
+                [
+                    "East African German"
+                ],
+                [
+                    "German German"
+                ],
+                [
+                    "Hessian German"
+                ],
+                [
+                    "Indiana German"
+                ],
+                [
+                    "Liechtenstein German"
+                ],
+                [
+                    "Lorraine German"
+                ],
+                [
+                    "Luxembourgish German"
+                ],
+                [
+                    "Namibian German"
+                ],
+                [
+                    "Northern German"
+                ],
+                [
+                    "Prussian German"
+                ],
+                [
+                    "Silesia German"
+                ],
+                [
+                    "South African German"
+                ],
+                [
+                    "Southern German"
+                ],
+                [
+                    "South Tyrolean German"
+                ],
+                [
+                    "Switzerland German"
+                ],
+                [
+                    "Texan German"
+                ]
+            ]
+        },
+        {
+            "code": "ar",
+            "name": "Arabic",
+            "type": "regular",
+            "wikidata": "Q13955",
+            "family": "sem-arb",
+            "scripts": [
+                "Arab",
+                "Hebr",
+                "Syrc",
+                "Brai",
+                "Nbat"
+            ],
+            "ancestors": [],
+            "aliases": [
+                "Standard Arabic",
+                "Literary Arabic",
+                "High Arabic"
+            ],
+            "parent": null,
+            "full": "ar",
+            "varieties": [
+                [
+                    "Modern Standard Arabic"
+                ],
+                [
+                    "Classical Arabic"
+                ],
+                [
+                    "Judeo-Arabic"
+                ]
+            ]
+        },
+        {
+            "code": "xgm",
+            "name": "Darumbal",
+            "type": "regular",
+            "wikidata": "Q16954400",
+            "family": "aus-pam",
+            "scripts": [
+                "Latn"
+            ],
+            "ancestors": [],
+            "aliases": [
+                "Darambal",
+                "Dharumbal",
+                "Dharambal"
+            ],
+            "parent": null,
+            "full": "xgm",
+            "varieties": [
+                [
+                    "Guwinmal",
+                    "Kuinmabara"
+                ],
+                [
+                    "Karunbara"
+                ],
+                [
+                    "Rakiwara"
+                ],
+                [
+                    "Wapabara",
+                    "Wapabura"
+                ]
+            ]
+        },
+        {
+            "code": "oc-lim",
+            "name": "Limousin",
+            "type": "etymology-only",
+            "wikidata": "Q427614",
+            "family": "roa-ocr",
+            "scripts": [],
+            "ancestors": [],
+            "aliases": [],
+            "parent": "oc",
+            "full": "oc",
+            "varieties": []
+        },
+        {
+            "code": "mul",
+            "name": "Translingual",
+            "type": "regular",
+            "wikidata": "Q7834564",
+            "family": "qfa-not",
+            "scripts": [
+                "Adlm",
+                "Afak",
+                "Aghb",
+                "Ahom",
+                "Arab",
+                "Aran",
+                "Armi",
+                "Armn",
+                "Avst",
+                "Bali",
+                "Bamu",
+                "Bass",
+                "Batk",
+                "Beng",
+                "Berf",
+                "Bhks",
+                "Blis",
+                "Bopo",
+                "Brah",
+                "Brai",
+                "Bugi",
+                "Buhd",
+                "Cakm",
+                "Cans",
+                "Cari",
+                "Cham",
+                "Cher",
+                "Chis",
+                "Chrs",
+                "Copt",
+                "Cpmn",
+                "Cprt",
+                "Cyrl",
+                "Cyrs",
+                "Deva",
+                "Diak",
+                "Dogr",
+                "Dsrt",
+                "Dupl",
+                "Egyd",
+                "Egyh",
+                "Egyp",
+                "Elba",
+                "Elym",
+                "Ethi",
+                "Gara",
+                "Geok",
+                "Geor",
+                "Glag",
+                "Gong",
+                "Gonm",
+                "Goth",
+                "Gran",
+                "Grek",
+                "Gujr",
+                "Gukh",
+                "Guru",
+                "Hang",
+                "Hani",
+                "Hano",
+                "Hans",
+                "Hant",
+                "Hatr",
+                "Hebr",
+                "Hira",
+                "Hluw",
+                "Hmng",
+                "Hmnp",
+                "Hrkt",
+                "Hung",
+                "Ibrnn",
+                "Ibrns",
+                "Image",
+                "Inds",
+                "Ipach",
+                "Ital",
+                "Java",
+                "Jpan",
+                "Jurc",
+                "Kali",
+                "Kana",
+                "Kawi",
+                "Khar",
+                "Khmr",
+                "Khoj",
+                "Khomt",
+                "Kitl",
+                "Kits",
+                "Knda",
+                "Kore",
+                "Kpel",
+                "Krai",
+                "Kthi",
+                "Kulit",
+                "Lana",
+                "Laoo",
+                "Latf",
+                "Latg",
+                "Latn",
+                "Leke",
+                "Lepc",
+                "Limb",
+                "Lina",
+                "Linb",
+                "Lisu",
+                "Loma",
+                "Lyci",
+                "Lydi",
+                "Mahj",
+                "Maka",
+                "Mand",
+                "Mani",
+                "Marc",
+                "Maya",
+                "Medf",
+                "Mend",
+                "Merc",
+                "Mero",
+                "Mlym",
+                "Modi",
+                "Mong",
+                "Moon",
+                "Morse",
+                "Mroo",
+                "Mtei",
+                "Mult",
+                "Music",
+                "Mymr",
+                "Nagm",
+                "Nand",
+                "Narb",
+                "Nbat",
+                "Newa",
+                "Nkdb",
+                "Nkgb",
+                "Nkoo",
+                "None",
+                "Nshu",
+                "Ogam",
+                "Olck",
+                "Onao",
+                "Orkh",
+                "Orya",
+                "Osge",
+                "Osma",
+                "Ougr",
+                "Palm",
+                "Pauc",
+                "Pcun",
+                "Pelm",
+                "Perm",
+                "Phag",
+                "Phli",
+                "Phlp",
+                "Phlv",
+                "Phnx",
+                "Plrd",
+                "Polyt",
+                "Prti",
+                "Psin",
+                "Ranj",
+                "Rjng",
+                "Rohg",
+                "Roro",
+                "Rumin",
+                "Runr",
+                "Samr",
+                "Sarb",
+                "Saur",
+                "Seal",
+                "Semap",
+                "Sgnw",
+                "Shaw",
+                "Shrd",
+                "Shui",
+                "Sidd",
+                "Sidt",
+                "Sind",
+                "Sinh",
+                "Sogd",
+                "Sogo",
+                "Sora",
+                "Soyo",
+                "Sund",
+                "Sunu",
+                "Sylo",
+                "Syrc",
+                "Tagb",
+                "Takr",
+                "Tale",
+                "Talu",
+                "Taml",
+                "Tang",
+                "Tavt",
+                "Tayo",
+                "Telu",
+                "Teng",
+                "Tfng",
+                "Tglg",
+                "Thaa",
+                "Thai",
+                "Tibt",
+                "Tirh",
+                "Tnsa",
+                "Todr",
+                "Tols",
+                "Toto",
+                "Tutg",
+                "Ugar",
+                "Vaii",
+                "Visp",
+                "Vith",
+                "Wara",
+                "Wcho",
+                "Wole",
+                "Xpeo",
+                "Xsux",
+                "Yezi",
+                "Yiii",
+                "Zanb",
+                "Zmth",
+                "Zname",
+                "Zsym",
+                "Zxxx",
+                "Zyyy",
+                "Zzzz",
+                "as-Beng",
+                "mnc-Mong",
+                "pal-Avst",
+                "pjt-Latn",
+                "sit-tam-Tibt",
+                "sjo-Mong",
+                "xwo-Mong"
+            ],
+            "ancestors": [],
+            "aliases": [],
+            "parent": null,
+            "full": "mul",
+            "varieties": []
+        }
+    ],
+    "families": [
+        {
+            "code": "ine",
+            "name": "Indo-European",
+            "wikidata": "Q19860",
+            "parent": null,
+            "protoLanguage": "ine-pro",
+            "aliases": [
+                "Indo-Germanic"
+            ],
+            "languages": [
+                "cms",
+                "ine-pae",
+                "ine-pro",
+                "txh",
+                "xdc",
+                "xil",
+                "xlg",
+                "xli",
+                "xls",
+                "xly",
+                "xpg",
+                "xve",
+                "yms"
+            ]
+        },
+        {
+            "code": "gmw-ang",
+            "name": "Anglic",
+            "wikidata": "Q1346342",
+            "parent": "gmw-afr",
+            "protoLanguage": "ang",
+            "aliases": [],
+            "languages": [
+                "ang",
+                "en",
+                "enm",
+                "gmw-msc",
+                "sco"
+            ]
+        },
+        {
+            "code": "gmw",
+            "name": "West Germanic",
+            "wikidata": "Q26721",
+            "parent": "gem",
+            "protoLanguage": "gmw-pro",
+            "aliases": [],
+            "languages": [
+                "gmw-pro"
+            ]
+        },
+        {
+            "code": "sem-arb",
+            "name": "Arabic",
+            "wikidata": "Q164667",
+            "parent": "sem-cen",
+            "protoLanguage": "ar",
+            "aliases": [],
+            "languages": [
+                "abh",
+                "abv",
+                "acm",
+                "acw",
+                "acx",
+                "acy",
+                "adf",
+                "aeb",
+                "afb",
+                "ajp",
+                "apc",
+                "apd",
+                "ar",
+                "arq",
+                "ars",
+                "ary",
+                "arz",
+                "auz",
+                "ayl",
+                "ayn",
+                "ayp",
+                "mey",
+                "mt",
+                "shu",
+                "sqr",
+                "ssh",
+                "xaa"
+            ]
+        }
+    ],
+    "scripts": [
+        {
+            "code": "Latn",
+            "name": "Latin",
+            "wikidata": "Q8229",
+            "system": "alphabet",
+            "aliases": [
+                "Roman"
+            ],
+            "parent": null,
+            "direction": "ltr",
+            "localNames": {}
+        },
+        {
+            "code": "Arab",
+            "name": "Arabic",
+            "wikidata": "Q1828555",
+            "system": "abjad",
+            "aliases": [],
+            "parent": null,
+            "direction": "rtl",
+            "localNames": {}
+        },
+        {
+            "code": "Aran",
+            "name": "Arabic",
+            "wikidata": "Q1133121",
+            "system": "abjad",
+            "aliases": [
+                "Nastaliq",
+                "Nastaleeq"
+            ],
+            "parent": "Arab",
+            "direction": "rtl",
+            "localNames": {
+                "hnd": "Shahmukhi",
+                "hno": "Shahmukhi",
+                "inc-opa": "Shahmukhi",
+                "lah": "Shahmukhi",
+                "pa": "Shahmukhi",
+                "phr": "Shahmukhi",
+                "skr": "Shahmukhi"
+            }
+        },
+        {
+            "code": "Hans",
+            "name": "Simplified Han",
+            "wikidata": "Q185614",
+            "system": "logography",
+            "aliases": [],
+            "parent": "Hani",
+            "direction": "ltr",
+            "localNames": {}
+        },
+        {
+            "code": "Deva",
+            "name": "Devanagari",
+            "wikidata": "Q38592",
+            "system": "abugida",
+            "aliases": [],
+            "parent": null,
+            "direction": "ltr",
+            "localNames": {
+                "ahr": "Balbodh",
+                "kfq": "Balbodh",
+                "kok": "Balbodh",
+                "mr": "Balbodh",
+                "omr": "Balbodh",
+                "vah": "Balbodh"
+            }
+        },
+        {
+            "code": "Mong",
+            "name": "Mongolian",
+            "wikidata": "Q1055705",
+            "system": "alphabet",
+            "aliases": [
+                "Mongol bichig",
+                "Hudum Mongol bichig"
+            ],
+            "parent": null,
+            "direction": "vertical-ltr",
+            "localNames": {}
+        },
+        {
+            "code": "Hani",
+            "name": "Han",
+            "wikidata": "Q8201",
+            "system": "logography",
+            "aliases": [],
+            "parent": null,
+            "direction": "ltr",
+            "localNames": {}
+        }
+    ],
+    "named": {
+        "English": "en",
+        "Old English": "ang",
+        "Proto-Indo-European": "ine-pro",
+        "Arabic": "ar"
+    },
+    "missing": [
+        "xx-none",
+        "",
+        "EN"
+    ]
+}

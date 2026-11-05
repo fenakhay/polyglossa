@@ -1,0 +1,117 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_call:
+    inputs:
+      catalog:
+        description: The artifact holding new Wiktionary data to check in place of what is committed.
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Check on ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+          - os: macos-26
+          - os: windows-latest
+            skip: -x linuxX64Test
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+        if: inputs.catalog != ''
+        with:
+          name: ${{ inputs.catalog }}
+
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad
+        with:
+          distribution: temurin
+          java-version: 25
+
+      - uses: gradle/actions/setup-gradle@8da46b539cd8fe6ab27ca75128919a18d757604c
+
+      - name: Check
+        run: ./gradlew check detekt checkKotlinAbi ${{ matrix.skip }} --stacktrace
+
+  swift:
+    name: Swift on ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-26, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+        if: inputs.catalog != ''
+        with:
+          name: ${{ inputs.catalog }}
+
+      - name: Test the Swift package
+        run: swift test
+
+  python:
+    name: Python ${{ matrix.python }}
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.9', '3.13']
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+        if: inputs.catalog != ''
+        with:
+          name: ${{ inputs.catalog }}
+
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Test the Python package
+        working-directory: python
+        run: PYTHONPATH=src python -m unittest discover -s tests -v
+
+  sql:
+    name: SQL
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+        if: inputs.catalog != ''
+        with:
+          name: ${{ inputs.catalog }}
+
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad
+        with:
+          distribution: temurin
+          java-version: 25
+
+      - uses: gradle/actions/setup-gradle@8da46b539cd8fe6ab27ca75128919a18d757604c
+
+      - name: Write the catalog as SQL and load it into SQLite
+        run: |
+          ./gradlew sqlDump --stacktrace
+          sqlite3 polyglossa.sqlite < polyglossa-tools/build/sql/polyglossa.sql
+          sqlite3 polyglossa.sqlite "SELECT name FROM languages WHERE code = 'en'" | grep -x English

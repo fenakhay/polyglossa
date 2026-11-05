@@ -1,0 +1,186 @@
+name: Catalog
+
+on:
+  schedule:
+    - cron: '0 6 * * 4'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: catalog
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    name: Fetch Wiktionary's data
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.dump.outputs.changed }}
+      version: ${{ steps.dump.outputs.version }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad
+        with:
+          distribution: temurin
+          java-version: 25
+
+      - uses: gradle/actions/setup-gradle@8da46b539cd8fe6ab27ca75128919a18d757604c
+
+      - name: Fetch English Wiktionary's languages, families and scripts, failing if any export cannot be read
+        id: dump
+        run: ./gradlew catalogDump --stacktrace
+
+      - name: Refuse a version that is already released
+        if: steps.dump.outputs.changed == 'true'
+        env:
+          VERSION: ${{ steps.dump.outputs.version }}
+        run: |
+          if git ls-remote --exit-code --tags origin "refs/tags/$VERSION" > /dev/null; then
+            echo "::error::$VERSION is already released: Wiktionary's data changed again on the day it was exported"
+            exit 1
+          fi
+
+      - name: Keep the new data
+        if: steps.dump.outputs.changed == 'true'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: catalog
+          path: |
+            CHANGELOG.md
+            polyglossa/data/catalog.tsv
+            Sources/Polyglossa/Resources/catalog.tsv
+            python/src/polyglossa/catalog.tsv
+            python/src/polyglossa/_version.py
+            spec/expectations.json
+            polyglossa-tools/build/reports/catalog/notes.md
+          if-no-files-found: error
+
+  check:
+    name: Check the new data
+    needs: fetch
+    if: needs.fetch.outputs.changed == 'true'
+    uses: ./.github/workflows/ci.yml
+    with:
+      catalog: catalog
+
+  tag:
+    name: Commit and tag the release
+    needs: [fetch, check]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+        with:
+          name: catalog
+
+      - name: Commit the data and tag the release
+        env:
+          VERSION: ${{ needs.fetch.outputs.version }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add CHANGELOG.md polyglossa/data/catalog.tsv Sources/Polyglossa/Resources/catalog.tsv \
+            python/src/polyglossa/catalog.tsv python/src/polyglossa/_version.py spec/expectations.json
+          git commit -m "feat(catalog): record English Wiktionary's data for $VERSION"
+          git tag "$VERSION"
+          git push --atomic origin HEAD:main "refs/tags/$VERSION"
+
+  maven-central:
+    name: Publish to Maven Central
+    needs: [fetch, tag]
+    runs-on: macos-26
+    environment: maven-central
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: refs/tags/${{ needs.fetch.outputs.version }}
+
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad
+        with:
+          distribution: temurin
+          java-version: 25
+
+      - uses: gradle/actions/setup-gradle@8da46b539cd8fe6ab27ca75128919a18d757604c
+
+      - name: Upload to the Central Portal
+        env:
+          CENTRAL_PORTAL_USERNAME: ${{ secrets.CENTRAL_PORTAL_USERNAME }}
+          CENTRAL_PORTAL_PASSWORD: ${{ secrets.CENTRAL_PORTAL_PASSWORD }}
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+          SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
+        run: >-
+          ./gradlew nmcpPublishAggregationToCentralPortal
+          -PreleaseVersion=${{ needs.fetch.outputs.version }} --stacktrace
+
+      - name: Say what is left to do by hand
+        run: echo "The deployment waits on the Central Portal until it is published there by hand." >> "$GITHUB_STEP_SUMMARY"
+
+  pypi:
+    name: Publish to PyPI
+    needs: [fetch, tag]
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: refs/tags/${{ needs.fetch.outputs.version }}
+
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0
+        with:
+          python-version: '3.13'
+
+      - name: Build the wheel and the source archive
+        env:
+          VERSION: ${{ needs.fetch.outputs.version }}
+        run: |
+          grep -qx "__version__ = \"$VERSION\"" python/src/polyglossa/_version.py
+          python -m pip install --quiet build
+          python -m build python
+
+      - uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086
+        with:
+          packages-dir: python/dist/
+
+  release:
+    name: Publish the GitHub release
+    needs: [fetch, tag]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: refs/tags/${{ needs.fetch.outputs.version }}
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+        with:
+          name: catalog
+          path: ${{ runner.temp }}/catalog
+
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad
+        with:
+          distribution: temurin
+          java-version: 25
+
+      - uses: gradle/actions/setup-gradle@8da46b539cd8fe6ab27ca75128919a18d757604c
+
+      - name: Write the catalog as SQL
+        run: ./gradlew sqlDump --stacktrace
+
+      - name: Publish the release, with the catalog as TSV and as SQL
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.fetch.outputs.version }}
+        run: |
+          gh release create "$VERSION" --repo "$GITHUB_REPOSITORY" --title "$VERSION" \
+            --notes-file "$RUNNER_TEMP/catalog/polyglossa-tools/build/reports/catalog/notes.md" \
+            polyglossa/data/catalog.tsv polyglossa-tools/build/sql/polyglossa.sql

@@ -1,0 +1,27 @@
+# Changelog
+
+Notable changes to Polyglossa, newest first.
+
+The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). A version is the day the
+data was exported from Wiktionary, `year.month.day`; the API changes only through deprecation.
+
+## [2026.11.5] — unreleased
+
+### Added
+
+- `Language`, `LanguageFamily`, `Script` and `Variety`: English Wiktionary's languages, etymology-only
+  varieties, families and scripts, looked up with `Language.of("en")`, `Language["xx"]`,
+  `Language.named("Old English")` and `"ang" in Language`, and linked to one another.
+- `Catalog`, the set they come from: `Catalog.BUNDLED`, built in from `polyglossa/data/catalog.tsv`, its
+  `date`, and `fromExports`, `fromTsv` and `toTsv` for others.
+- `catalogDump` and `catalogCheck`, which record Wiktionary's data and say when it has changed.
+  `catalogDump` rewrites the catalog only when the data has changed, adds the release to `CHANGELOG.md`,
+  and fails without writing when an export cannot be read or comes back cut short.
+- A weekly workflow that fetches Wiktionary's data and, only when it has changed, checks it, tags it and
+  publishes the release.
+- A Swift package, `Polyglossa`, with the same types, read from the same `catalog.tsv`.
+- A Python package, `polyglossa`, for Python 3.9 and up, with the same types.
+- `sqlDump`, which writes the catalog as SQL for SQLite, PostgreSQL and MySQL.
+- `spec/expectations.json`, which the Kotlin, Swift and Python tests all check their answers against.
+
+[2026.11.5]: https://github.com/fenakhay/polyglossa/commits/main
