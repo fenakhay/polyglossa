@@ -94,7 +94,8 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add CHANGELOG.md polyglossa/data/catalog.tsv Sources/Polyglossa/Resources/catalog.tsv \
+          sed -E -i "s/(polyglossa:polyglossa:|from: \")[0-9]+\.[0-9]+\.[0-9]+/\1$VERSION/" README.md
+          git add CHANGELOG.md README.md polyglossa/data/catalog.tsv Sources/Polyglossa/Resources/catalog.tsv \
             python/src/polyglossa/catalog.tsv python/src/polyglossa/_version.py spec/expectations.json
           if [ "$CHANGED" = true ]; then
             git commit -m "feat(catalog): record English Wiktionary's data for $VERSION"
@@ -197,3 +198,15 @@ jobs:
           gh release create "$VERSION" --repo "$GITHUB_REPOSITORY" --title "$VERSION" \
             --notes-file "$RUNNER_TEMP/catalog/polyglossa-tools/build/reports/catalog/notes.md" \
             polyglossa/data/catalog.tsv polyglossa-tools/build/sql/polyglossa.sql
+
+  docs:
+    name: Publish the documentation of the release
+    needs: [fetch, release]
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - name: Rebuild the site from main
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run docs.yml --repo "$GITHUB_REPOSITORY" --ref main

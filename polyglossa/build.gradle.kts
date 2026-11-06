@@ -66,3 +66,5 @@ kotlin {
         }
     }
 }
+
+dokka { moduleName = "polyglossa" }

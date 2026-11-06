@@ -15,6 +15,8 @@ data was exported from Wiktionary, `year.month.day`; the API changes only throug
 - `Script.ranges`, the code points of a script from `Module:scripts/data`, with `contains` and `count`, and
   `Script.marks`, the characters that tell Traditional from Simplified Han, from Unicode 18.0.0's Unihan.
 - `script_ranges` and `script_marks` in the SQL dump.
+- Documentation at [docs.fenakhay.com/polyglossa](https://docs.fenakhay.com/polyglossa/), with every example
+  in Kotlin, Swift and Python and the Kotlin API reference, and a logo.
 
 ## [2026.11.6] — 2026-11-06
 

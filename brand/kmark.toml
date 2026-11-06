@@ -1,0 +1,16 @@
+# Polyglossa: a P drawn as a speech bubble, its stem the tail, on an 8 × 8 grid.
+name = "polyglossa"
+palette = "Multiplatform"
+
+[mark]
+rows = [
+    ". . . . . . . .",
+    ". 3 # # # # 1 .",
+    ". # # . . # # .",
+    ". # # . . # # .",
+    ". # # # # # 7 .",
+    ". # # . . . . .",
+    ". # 7 . . . . .",
+    ". . . . . . . .",
+]
+gap = 0

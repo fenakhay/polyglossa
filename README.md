@@ -1,4 +1,9 @@
-# Polyglossa
+<h1>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="brand/logo-light.svg">
+    <img alt="Polyglossa" src="brand/logo-dark.svg" height="48">
+  </picture>
+</h1>
 
 English Wiktionary's languages, language families and scripts, for Kotlin Multiplatform, Swift and
 Python, and as SQL: every code Wiktionary uses, what it calls each one, and how they relate, built into
@@ -7,10 +12,11 @@ the library so nothing is asked of the wiki.
 [![Maven Central](https://img.shields.io/maven-central/v/com.fenakhay.polyglossa/polyglossa)](https://central.sonatype.com/artifact/com.fenakhay.polyglossa/polyglossa)
 [![PyPI](https://img.shields.io/pypi/v/polyglossa)](https://pypi.org/project/polyglossa/)
 [![Kotlin](https://img.shields.io/badge/kotlin-2.5.0--Beta2-7F52FF.svg?logo=kotlin)](https://kotlinlang.org)
-[![Swift](https://img.shields.io/badge/swift-5.9%2B-F05138.svg?logo=swift)](#swift)
-[![Python](https://img.shields.io/badge/python-3.11%2B-3776AB.svg?logo=python&logoColor=white)](#python)
+[![Swift](https://img.shields.io/badge/swift-5.9%2B-F05138.svg?logo=swift)](https://docs.fenakhay.com/polyglossa/getting-started/installing/)
+[![Python](https://img.shields.io/badge/python-3.11%2B-3776AB.svg?logo=python&logoColor=white)](https://docs.fenakhay.com/polyglossa/getting-started/installing/)
 [![CI](https://github.com/fenakhay/polyglossa/actions/workflows/ci.yml/badge.svg)](https://github.com/fenakhay/polyglossa/actions/workflows/ci.yml)
 [![Catalog](https://github.com/fenakhay/polyglossa/actions/workflows/catalog.yml/badge.svg)](https://github.com/fenakhay/polyglossa/actions/workflows/catalog.yml)
+[![Docs](https://img.shields.io/badge/docs-docs.fenakhay.com%2Fpolyglossa-0A74B8.svg)](https://docs.fenakhay.com/polyglossa/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Data](https://img.shields.io/badge/data-CC%20BY--SA%204.0-lightgrey.svg)](NOTICE)
 
@@ -19,55 +25,11 @@ val english = Language.of("en")
 english.name                                  // "English"
 english.family?.name                          // "Anglic"
 english.ancestors.map { it.name }             // [Early Modern English]
-english.scripts.first().name                  // "Latin"
-Language["xx"]                                // null: no such language
 Language.named("Old English")?.code           // "ang"
-"ang" in Language                             // true
-Language.of("en-ear").full                    // English, for an etymology-only variety
-Language.of("de").varieties.map { it.name }   // [Alsatian German, American German, …]
-
 LanguageFamily.of("ine").protoLanguage?.name  // "Proto-Indo-European"
-LanguageFamily.of("gmw-ang").languages        // the languages directly in it
-
-Script.named("Arabic")?.direction             // RIGHT_TO_LEFT
-Script.of("Hans").parent?.name                // "Han"
 Script.of("Deva").nameFor(Language.of("mr"))  // "Balbodh"
+Language.of("zh").detectScript("語言")         // Traditional Han (Hant)
 ```
-
-Links between languages, families and scripts are the objects themselves: `family`, `ancestors`,
-`parent`, `full`, `scripts`, `protoLanguage`. Lookups that may miss return `null`; `of` throws for a code
-Wiktionary does not have.
-
-## Detecting scripts
-
-Polyglossa tells which script a text is in the way Wiktionary's `findBestScript` does, from the
-characters each script has in `Module:scripts`, so a bot can fill `sc=` or catch a term tagged with the
-wrong script without asking the wiki:
-
-```kotlin
-Language.of("sh").detectScript("Москва")    // Cyrillic (Cyrl)
-Language.of("sh").detectScript("Moskva")    // Latin (Latn)
-Language.of("zh").detectScript("語言")       // Traditional Han (Hant)
-Language.of("zh").detectScript("语言")       // Simplified Han (Hans)
-Language.of("ja").detectScript("ひらがな")   // Japanese (Jpan)
-Language.of("en").detectScript("123")       // null
-Script.detect("Ελληνικά")                   // Greek (Grek), whatever the language
-0x416 in Script.of("Cyrl")                  // true
-Script.of("Arab").count("كتاب abc")          // 4
-```
-
-With a language, its scripts are tried in order: the first that has every character wins, or else the one
-with the most of them. Spaces and ASCII punctuation don't count. Without one, the script most of the
-characters belong to wins, and the result is `null` when more of them belong to no script.
-
-Traditional and Simplified Han are told apart by [Unihan](https://www.unicode.org/reports/tr38/)'s
-variants rather than by Wiktionary's own lists, so a character both forms share, such as 后 or 干, counts
-for neither. Checked against Wiktionary on 1,008 lemmas from 32 languages, with and without their
-language, it answered the same for all but three: two such Han characters, and ↓, which Wiktionary's
-precomputed table puts in a script whose characters no longer hold it.
-
-Swift has `detectScript(_:)` and `Script.detect(_:)`, and Python has `detect_script(text)` and
-`Script.detect(text)`, with the same answers.
 
 ## Install
 
@@ -77,104 +39,35 @@ dependencies {
 }
 ```
 
-It runs on the JVM (21 and up), JavaScript and natively on macOS, Linux and Windows.
-
-## Swift
-
-A native Swift package, for macOS 12, iOS 15, tvOS 15, watchOS 8 and Linux:
-
 ```swift
 .package(url: "https://github.com/fenakhay/polyglossa", from: "2026.11.6")
 ```
-
-```swift
-import Polyglossa
-
-let english = try Language.of("en")
-english.name                          // "English"
-english.family?.name                  // Optional("Anglic")
-Language["xx"]                        // nil
-Language.named("Old English")?.code   // Optional("ang")
-Catalog.bundled.date                  // Optional("2026-11-06")
-```
-
-## Python
-
-Python 3.11 and up, with nothing but the standard library:
 
 ```bash
 pip install polyglossa
 ```
 
-```python
-from polyglossa import Language, LanguageFamily
+The Kotlin library runs on the JVM (21 and up), JavaScript and natively on macOS, Linux and Windows; the
+Swift package on macOS 12, iOS 15, tvOS 15, watchOS 8 and Linux; the Python package on Python 3.11 and up.
+Each release also has the catalog as plain SQL for SQLite, PostgreSQL and MySQL.
 
-english = Language["en"]
-english.name                                      # 'English'
-english.family.name                               # 'Anglic'
-Language.get("xx")                                # None
-"ang" in Language                                 # True
-LanguageFamily.of("ine").proto_language.name      # 'Proto-Indo-European'
-```
+## Documentation
 
-## SQL
+The documentation is at **[docs.fenakhay.com/polyglossa](https://docs.fenakhay.com/polyglossa/)**, with
+every example in Kotlin, Swift and Python:
 
-The catalog as plain SQL, which SQLite, PostgreSQL and MySQL all read: `languages`, `families` and
-`scripts`, with each list (a language's scripts, ancestors, aliases and varieties) a table of its own
-ordered by `position`, and each script's characters as `script_ranges` of first and last code points.
-
-```bash
-./gradlew sqlDump
-sqlite3 polyglossa.sqlite < polyglossa-tools/build/sql/polyglossa.sql
-```
-
-```sql
-SELECT s.name FROM language_scripts ls JOIN scripts s ON s.code = ls.script
-WHERE ls.language = 'ar' ORDER BY ls.position;
-
-SELECT script FROM script_ranges WHERE 1046 BETWEEN first AND last;   -- U+0416, Ж: Cyrl
-```
-
-## One catalog, four readers
-
-Every reader takes the same `catalog.tsv`: `catalogDump` copies it into the Swift package
-(`Sources/Polyglossa/Resources`) and the Python package (`python/src/polyglossa`), and `check` fails if a
-copy differs. [`spec/expectations.json`](spec/expectations.json), written from the Kotlin library with
-the catalog, lists what a sample of languages, families and scripts must answer; the Kotlin, Swift and
-Python tests all read it, so the three libraries answer alike.
-
-Polyglossa is versioned by the day its data was exported from Wiktionary: `2026.11.6` holds Wiktionary's
-languages as they were on 6 November 2026, and `Catalog.BUNDLED.date` says so at run time. There is at most
-one release a day, made when the data changes or by hand (see [The data](#the-data)). The API changes only
-through deprecation: what a release deprecates stays until a release at least a year later.
-
-## The data
-
-Polyglossa's data is a copy of what English Wiktionary's
-[`Module:JSON data`](https://en.wiktionary.org/wiki/Module:JSON_data) exports from `Module:languages`,
-`Module:etymology languages`, `Module:families` and `Module:scripts`, with the marks of Traditional and
-Simplified Han from Unicode's Unihan. It is kept as tab-separated lines
-in [`polyglossa/data/catalog.tsv`](polyglossa/data/catalog.tsv), a language, a family or a script to a line, so a
-change to it reads as a diff, and compiled into the library.
-
-```bash
-./gradlew catalogCheck   # says what Wiktionary has changed since, and fails if anything has
-./gradlew catalogDump    # records it again, dated today, if it has changed: the next release's version
-./gradlew specDump       # writes spec/expectations.json again from catalog.tsv as it is
-```
-
-Releases are made by the [Catalog workflow](.github/workflows/catalog.yml), every Thursday:
-
-1. It fetches Wiktionary's exports with `catalogDump`. The run fails if an export cannot be read, comes
-   back as a Lua error, or loses more than a tenth of the languages, families or scripts, and nothing is
-   written.
-2. If the data is what `catalog.tsv` already has, it stops there: no release. Run by hand with `release`
-   ticked, it goes on, records the catalog dated today and releases what `CHANGELOG.md` has unreleased, such
-   as a change to the code; with nothing unreleased, the run fails.
-3. When there is a release, it runs the whole of CI against the new catalog, then commits it with its
-   `CHANGELOG.md` section and tags the commit with the version, the day of the export.
-4. From that tag it publishes to Maven Central and PyPI and makes a GitHub release with the catalog as
-   TSV and as SQL and its `CHANGELOG.md` section, with what changed in the data, as its notes. Swift Package Manager reads the tag itself.
+- [Quick start](https://docs.fenakhay.com/polyglossa/getting-started/quick-start/) and
+  [Installing](https://docs.fenakhay.com/polyglossa/getting-started/installing/)
+- [Languages](https://docs.fenakhay.com/polyglossa/guides/languages/),
+  [Families](https://docs.fenakhay.com/polyglossa/guides/families/) and
+  [Scripts](https://docs.fenakhay.com/polyglossa/guides/scripts/)
+- [Detecting scripts](https://docs.fenakhay.com/polyglossa/guides/detecting-scripts/)
+- [Catalogs](https://docs.fenakhay.com/polyglossa/guides/catalogs/) and
+  [SQL](https://docs.fenakhay.com/polyglossa/guides/sql/)
+- [The data and releases](https://docs.fenakhay.com/polyglossa/reference/data-and-releases/)
+- [API reference](https://docs.fenakhay.com/polyglossa/api/) and
+  [Swift and Python](https://docs.fenakhay.com/polyglossa/reference/swift-and-python/)
+- [Building](https://docs.fenakhay.com/polyglossa/contributing/building/)
 
 ## Licence
 
