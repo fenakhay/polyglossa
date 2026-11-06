@@ -1,7 +1,7 @@
 <h1>
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="brand/logo-light.svg">
-    <img alt="Polyglossa" src="brand/logo-dark.svg" height="48">
+    <img alt="polyglossa" src="brand/logo-dark.svg" height="48">
   </picture>
 </h1>
 

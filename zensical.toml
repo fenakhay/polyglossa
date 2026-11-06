@@ -1,5 +1,5 @@
 [project]
-site_name = "Polyglossa"
+site_name = "polyglossa"
 site_url = "https://docs.fenakhay.com/polyglossa/"
 site_description = "English Wiktionary's languages, language families and scripts, for Kotlin, Swift, Python and SQL."
 site_author = "fenakhay"

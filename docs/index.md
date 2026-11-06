@@ -3,7 +3,7 @@ hide:
   - navigation
 ---
 
-# ![Polyglossa](brand/logo-dark.svg#only-light){ width="260" } ![Polyglossa](brand/logo-light.svg#only-dark){ width="260" }
+# ![polyglossa](brand/logo-dark.svg#only-light){ width="260" } ![polyglossa](brand/logo-light.svg#only-dark){ width="260" }
 
 English Wiktionary's languages, language families and scripts, for Kotlin Multiplatform, Swift, Python and
 SQL. Every code Wiktionary uses, what it calls each one and how they relate, built into the library, so

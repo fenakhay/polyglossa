@@ -1,11 +1,11 @@
-Polyglossa
+polyglossa
 Copyright (c) 2026 fenakhay
 
-polyglossa/data/catalog.tsv, and the copy of it built into Polyglossa, holds English Wiktionary's language,
+polyglossa/data/catalog.tsv, and the copy of it built into polyglossa, holds English Wiktionary's language,
 language family and script data, exported by Module:JSON data from Module:languages, Module:etymology
 languages, Module:families and Module:scripts (https://en.wiktionary.org). It is available under the
 Creative Commons Attribution-ShareAlike 4.0 License (https://creativecommons.org/licenses/by-sa/4.0/), not
-under Polyglossa's own licence; see the page histories on English Wiktionary for its authors.
+under polyglossa's own licence; see the page histories on English Wiktionary for its authors.
 
 The marks of Traditional and Simplified Han in the same file come from the Unicode Character Database's
 Unihan_Variants.txt, Unicode 18.0.0 (https://www.unicode.org/Public/18.0.0/ucd/), under the Unicode License

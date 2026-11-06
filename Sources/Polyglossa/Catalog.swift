@@ -8,7 +8,7 @@ public enum PolyglossaError: Error, Equatable, CustomStringConvertible {
     case unknownFamily(String)
     /// Wiktionary has no script with this code.
     case unknownScript(String)
-    /// The text is not a catalog Polyglossa wrote.
+    /// The text is not a catalog polyglossa wrote.
     case notACatalog(String)
 
     public var description: String {
@@ -16,7 +16,7 @@ public enum PolyglossaError: Error, Equatable, CustomStringConvertible {
         case .unknownLanguage(let code): return "Wiktionary has no language \(code)"
         case .unknownFamily(let code): return "Wiktionary has no family \(code)"
         case .unknownScript(let code): return "Wiktionary has no script \(code)"
-        case .notACatalog(let why): return "not a catalog Polyglossa wrote: \(why)"
+        case .notACatalog(let why): return "not a catalog polyglossa wrote: \(why)"
         }
     }
 }
@@ -30,7 +30,7 @@ public final class Catalog: @unchecked Sendable {
         guard let url = Bundle.module.url(forResource: "catalog", withExtension: "tsv"),
               let text = try? String(contentsOf: url, encoding: .utf8),
               let catalog = try? Catalog(tsv: text)
-        else { fatalError("the catalog bundled with Polyglossa cannot be read") }
+        else { fatalError("the catalog bundled with polyglossa cannot be read") }
         return catalog
     }()
 

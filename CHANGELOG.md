@@ -1,6 +1,6 @@
 # Changelog
 
-Notable changes to Polyglossa, newest first.
+Notable changes to polyglossa, newest first.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). A version is the day the
 data was exported from Wiktionary, `year.month.day`; the API changes only through deprecation.

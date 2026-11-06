@@ -1,4 +1,4 @@
-# Polyglossa
+# polyglossa
 
 English Wiktionary's languages, language families and scripts for Python: every code Wiktionary uses,
 what it calls each one, and how they relate, bundled with the package so nothing is asked of the wiki.

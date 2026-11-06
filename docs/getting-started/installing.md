@@ -1,6 +1,6 @@
 # Installing
 
-Polyglossa is one library with four readers of the same data. Each holds a copy of the catalog, so none
+polyglossa is one library with four readers of the same data. Each holds a copy of the catalog, so none
 of them reaches the network.
 
 === "Kotlin"

@@ -1,7 +1,7 @@
 # Quick start
 
 This page looks up a language, follows its links to its family and ancestors, and tells which script a
-word is written in. It assumes Polyglossa is installed: [Installing](installing.md) has the coordinates.
+word is written in. It assumes polyglossa is installed: [Installing](installing.md) has the coordinates.
 
 ## Look up a language
 

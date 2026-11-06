@@ -52,7 +52,7 @@ internal object CatalogTable {
     fun read(text: String): Catalog {
         val lines = text.lines()
         val header = lines.firstOrNull().orEmpty()
-        require(header == HEADER || header.startsWith("$HEADER\t")) { "not a catalog Polyglossa wrote" }
+        require(header == HEADER || header.startsWith("$HEADER\t")) { "not a catalog polyglossa wrote" }
         val date = header.removePrefix(HEADER).removePrefix("\t").ifEmpty { null }
         val languages = mutableListOf<Language>()
         val families = mutableListOf<LanguageFamily>()

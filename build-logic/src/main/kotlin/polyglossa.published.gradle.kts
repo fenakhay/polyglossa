@@ -44,7 +44,7 @@ publishing {
         pom {
             name.set(project.name)
             description.set(
-                "Polyglossa — English Wiktionary's languages, families and scripts for Kotlin Multiplatform (${project.name})",
+                "polyglossa — English Wiktionary's languages, families and scripts for Kotlin Multiplatform (${project.name})",
             )
             url.set("https://github.com/fenakhay/polyglossa")
 

@@ -97,7 +97,7 @@ val fresh = Catalog.fromExports(texts, date = "2026-11-12")
 
 `expandOnTheWiki` stands for a call to the wiki's `action=expandtemplates`. The marks that tell
 Traditional from Simplified Han are not in Wiktionary's data: `withScriptMarks` adds them, by script code,
-as Polyglossa's own tool does from Unihan:
+as polyglossa's own tool does from Unihan:
 
 ```kotlin
 val marked = fresh.withScriptMarks(mapOf("Hant" to traditional, "Hans" to simplified))

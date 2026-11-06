@@ -2,7 +2,7 @@
 
 ## Where the data comes from
 
-Polyglossa's data is a copy of what English Wiktionary's
+polyglossa's data is a copy of what English Wiktionary's
 [`Module:JSON data`](https://en.wiktionary.org/wiki/Module:JSON_data) exports from `Module:languages`,
 `Module:etymology languages`, `Module:families` and `Module:scripts`: every language, etymology-only
 variety, family and script, with their names, links and characters. The marks that tell Traditional from

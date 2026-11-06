@@ -14,7 +14,7 @@ import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
 
 /**
- * What every implementation of Polyglossa must answer from the same `catalog.tsv`: a sample of languages,
+ * What every implementation of polyglossa must answer from the same `catalog.tsv`: a sample of languages,
  * families and scripts with every field and link, lookups by name, codes that must miss, the counts, and the
  * script detected for some texts, in a language or in none.
  *

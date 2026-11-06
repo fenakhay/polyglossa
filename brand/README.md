@@ -1,7 +1,7 @@
-# The Polyglossa logo
+# The polyglossa logo
 
 A P drawn as a speech bubble, its stem the bubble's tail, in Kotlin Multiplatform's gradient, and the
-Polyglossa wordmark. kmark draws them from [`kmark.toml`](kmark.toml): `kmark build brand/kmark.toml
+polyglossa wordmark. kmark draws them from [`kmark.toml`](kmark.toml): `kmark build brand/kmark.toml
 --out <dir>` writes the kit again, under kmark's own names, which are copied here as the table names them.
 The logos and icons are SVGs, with PNGs at four times their size. The avatars are 1024 px squares, and the social preview is a PNG only.
 

@@ -2,7 +2,7 @@ package com.fenakhay.polyglossa.tools
 
 /**
  * Adds a release of new Wiktionary data to a changelog in the form of
- * [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), as Polyglossa's `CHANGELOG.md` is written.
+ * [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), as polyglossa's `CHANGELOG.md` is written.
  *
  * The section on top that is not released yet, headed `## [Unreleased]` or `## [2026.11.5] — unreleased`,
  * becomes the release; without one, a section is added on top. Either way it says what the data brought, if

@@ -28,7 +28,7 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 
 /**
- * Writes or checks the catalog Polyglossa is built with, `polyglossa/data/catalog.tsv`, from what English
+ * Writes or checks the catalog polyglossa is built with, `polyglossa/data/catalog.tsv`, from what English
  * Wiktionary's `Module:JSON data` exports.
  *
  * The first argument is the file. `--check` compares what Wiktionary has now with the file instead of writing
@@ -125,7 +125,7 @@ internal class Wiktionary {
 
     private companion object {
         const val API = "https://en.wiktionary.org/w/api.php"
-        const val USER_AGENT = "Polyglossa/0.1 (https://github.com/fenakhay/polyglossa)"
+        const val USER_AGENT = "polyglossa/0.1 (https://github.com/fenakhay/polyglossa)"
         const val PAUSE_MILLIS = 500L
         const val TIMEOUT_SECONDS = 60L
         const val HTTP_OK = 200

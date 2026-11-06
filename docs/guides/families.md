@@ -52,7 +52,7 @@ languages directly in it and to the language it descends from.
 
 ## The proto-language
 
-Wiktionary names a family's proto-language when it has one. When it doesn't, Polyglossa looks for a
+Wiktionary names a family's proto-language when it has one. When it doesn't, polyglossa looks for a
 language with the family's code and `-pro`, as `ine` has `ine-pro`. Some families descend from an attested
 language instead: Arabic the family (`sem-arb`) descends from Arabic the language (`ar`).
 

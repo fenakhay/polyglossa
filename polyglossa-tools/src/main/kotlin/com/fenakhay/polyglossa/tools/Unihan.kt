@@ -23,7 +23,7 @@ internal object Unihan {
 
     private const val URL = "https://www.unicode.org/Public/$VERSION/ucd/Unihan.zip"
     private const val VARIANTS = "Unihan_Variants.txt"
-    private const val USER_AGENT = "Polyglossa/0.1 (https://github.com/fenakhay/polyglossa)"
+    private const val USER_AGENT = "polyglossa/0.1 (https://github.com/fenakhay/polyglossa)"
     private const val TIMEOUT_SECONDS = 120L
     private const val HTTP_OK = 200
     private const val HEX = 16

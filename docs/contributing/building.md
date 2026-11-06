@@ -1,6 +1,6 @@
 # Building
 
-Polyglossa builds with Gradle and JDK 25 (the build gives Gradle its own JDK through the Foojay toolchain
+polyglossa builds with Gradle and JDK 25 (the build gives Gradle its own JDK through the Foojay toolchain
 resolver). The Swift package needs Swift 5.9 or later, and the Python package Python 3.11 or later.
 
 ## Checking

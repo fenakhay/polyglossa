@@ -25,7 +25,7 @@ class UnknownScriptError(KeyError):
 
 
 class NotACatalogError(ValueError):
-    """The text is not a catalog Polyglossa wrote."""
+    """The text is not a catalog polyglossa wrote."""
 
 
 class LanguageType(enum.Enum):
@@ -579,7 +579,7 @@ def _read(text: str, catalog: Catalog) -> None:
     lines = text.split("\n")
     header = lines[0] if lines else ""
     if header != HEADER and not header.startswith(HEADER + "\t"):
-        raise NotACatalogError("not a catalog Polyglossa wrote")
+        raise NotACatalogError("not a catalog polyglossa wrote")
     catalog.date = header[len(HEADER) + 1:] or None
     for line in lines[1:]:
         if not line:

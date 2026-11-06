@@ -1,6 +1,6 @@
 # Detecting scripts
 
-Polyglossa tells which script a text is written in the way Wiktionary does, from the characters each
+polyglossa tells which script a text is written in the way Wiktionary does, from the characters each
 script has in `Module:scripts/data`, so a bot can fill `sc=`, or catch a term tagged with the wrong
 script, without asking the wiki. There are two ways to ask: in a language, which is what Wiktionary's
 `findBestScript` does, and in none, which is `findBestScriptWithoutLang`.
@@ -70,7 +70,7 @@ Three kinds of language are handled apart:
   detected as if it had no language.
 - **An etymology-only variety with no scripts of its own** uses its language's.
 
-Pass plain text: Wiktionary strips wiki markup before it detects, and Polyglossa counts whatever it is
+Pass plain text: Wiktionary strips wiki markup before it detects, and polyglossa counts whatever it is
 given.
 
 ## In no language
@@ -133,7 +133,7 @@ Wiktionary breaks some ties by the order of a Lua table, so a tie can come out d
 
 ## Traditional and Simplified Han
 
-Polyglossa tells the two forms of Han apart by Unicode's [Unihan](https://www.unicode.org/reports/tr38/)
+polyglossa tells the two forms of Han apart by Unicode's [Unihan](https://www.unicode.org/reports/tr38/)
 database, version 18.0.0, rather than by Wiktionary's hand-kept lists (`Module:zh/data/ts` and `st`):
 
 - A character is **Traditional** when every simplified form Unihan gives it is another character: 語,
@@ -148,9 +148,9 @@ text made only of them is Simplified Han there and Han here.
 ## How close it is to Wiktionary
 
 Checked against Wiktionary itself on 1,008 lemmas from 32 languages, each detected in its language and in
-none, Polyglossa gave Wiktionary's answer for all but three:
+none, polyglossa gave Wiktionary's answer for all but three:
 
-| Text | Language | Wiktionary | Polyglossa | Why |
+| Text | Language | Wiktionary | polyglossa | Why |
 |---|---|---|---|---|
 | fax机 | Cantonese | Simplified Han | Han | 机 is shared, by Unihan |
 | ⿸厂夬 | Cantonese | Simplified Han | Han | 厂 is shared, by Unihan |
