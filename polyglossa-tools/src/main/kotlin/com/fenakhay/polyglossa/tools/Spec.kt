@@ -23,7 +23,7 @@ import kotlinx.serialization.json.buildJsonObject
  */
 internal object Spec {
     private val LANGUAGES =
-        listOf("en", "en-ear", "ang", "ine-pro", "art-top", "de", "ar", "xgm", "oc-lim", "mul")
+        listOf("en", "en-ear", "en-US", "ang", "ine-pro", "art-top", "de", "ar", "xgm", "oc-lim", "mul")
     private val FAMILIES = listOf("ine", "gmw-ang", "gmw", "sem-arb")
     private val SCRIPTS = listOf("Latn", "Arab", "Aran", "Hans", "Deva", "Mong", "Hani")
     private val NAMES = listOf("English", "Old English", "Proto-Indo-European", "Arabic")

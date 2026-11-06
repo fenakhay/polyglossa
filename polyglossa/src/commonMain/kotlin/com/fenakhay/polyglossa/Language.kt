@@ -71,9 +71,22 @@ internal constructor(
     public val etymologyOnly: Boolean
         get() = type == LanguageType.ETYMOLOGY_ONLY
 
-    /** The family it belongs to, or `null`; an etymology-only variety has its language's. */
+    /**
+     * The family it belongs to, or `null`; an etymology-only variety with none of its own has that of the
+     * nearest of its parents that has one, as American English has English's through North American English.
+     */
     public val family: LanguageFamily?
-        get() = (familyCode ?: parent?.familyCode)?.let { links.family(it) }
+        get() {
+            var language: Language? = this
+            val seen = mutableSetOf<String>()
+            while (language != null && seen.add(language.code)) {
+                language.familyCode?.let {
+                    return links.family(it)
+                }
+                language = language.parent
+            }
+            return null
+        }
 
     /** The scripts it is written in, most usual first, those the catalog knows. */
     public val scripts: List<Script>

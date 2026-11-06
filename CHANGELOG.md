@@ -18,6 +18,11 @@ data was exported from Wiktionary, `year.month.day`; the API changes only throug
 - Documentation at [docs.fenakhay.com/polyglossa](https://docs.fenakhay.com/polyglossa/), with every example
   in Kotlin, Swift and Python and the Kotlin API reference, and a logo.
 
+### Fixed
+
+- `family` of an etymology-only variety whose parent is another variety, such as American English, is
+  that of the nearest parent with one, here English's, instead of none.
+
 ## [2026.11.6] — 2026-11-06
 
 ### Added

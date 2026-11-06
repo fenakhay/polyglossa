@@ -103,7 +103,7 @@ term would go in:
     val american = Language.of("en-US")
     american.parent                    // North American English (en-NNN)
     american.full                      // English (en)
-    american.full.family               // Anglic (gmw-ang)
+    american.family                    // Anglic (gmw-ang), its language's
     ```
 
 === "Swift"
@@ -112,7 +112,7 @@ term would go in:
     let american = try Language.of("en-US")
     american.parent                    // North American English (en-NNN)
     american.full                      // English (en)
-    american.full.family               // Anglic (gmw-ang)
+    american.family                    // Anglic (gmw-ang), its language's
     ```
 
 === "Python"
@@ -121,11 +121,11 @@ term would go in:
     american = Language["en-US"]
     american.parent.code               # 'en-NNN'
     american.full.code                 # 'en'
-    american.full.family.code          # 'gmw-ang'
+    american.family.code               # 'gmw-ang', its language's
     ```
 
-For a variety's family, ask its full language, as `full.family` does here. A variety with no scripts of
-its own is detected in its language's scripts.
+A variety with no family of its own has that of the nearest of its parents that has one, and one with no
+scripts of its own is detected in its language's scripts.
 
 ## Ancestors
 

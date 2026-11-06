@@ -93,9 +93,15 @@ class Language(metaclass=_Lookup):
 
     @property
     def family(self) -> Optional["LanguageFamily"]:
-        """The family it belongs to, or ``None``; an etymology-only variety has its language's."""
-        code = self._family_code or (self.parent._family_code if self.parent else None)
-        return self._catalog.family(code) if code else None
+        """The family it belongs to, or ``None``; an etymology-only variety with none of its own has that of the
+        nearest of its parents that has one, as American English has English's through North American English."""
+        language, seen = self, set()
+        while language is not None and language.code not in seen:
+            if language._family_code:
+                return self._catalog.family(language._family_code)
+            seen.add(language.code)
+            language = language.parent
+        return None
 
     @property
     def scripts(self) -> List["Script"]:

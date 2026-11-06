@@ -54,6 +54,19 @@
             "varieties": []
         },
         {
+            "code": "en-US",
+            "name": "American English",
+            "type": "etymology-only",
+            "wikidata": "Q7976",
+            "family": "gmw-ang",
+            "scripts": [],
+            "ancestors": [],
+            "aliases": [],
+            "parent": "en-NNN",
+            "full": "en",
+            "varieties": []
+        },
+        {
             "code": "ang",
             "name": "Old English",
             "type": "regular",

@@ -64,8 +64,17 @@ public final class Language: Hashable, CustomStringConvertible, @unchecked Senda
     /// Whether it is named in etymologies only, with no section of its own in an entry.
     public var isEtymologyOnly: Bool { type == .etymologyOnly }
 
-    /// The family it belongs to, or `nil`; an etymology-only variety has its language's.
-    public var family: LanguageFamily? { (familyCode ?? parent?.familyCode).flatMap { link.resolved.family($0) } }
+    /// The family it belongs to, or `nil`; an etymology-only variety with none of its own has that of the nearest
+    /// of its parents that has one, as American English has English's through North American English.
+    public var family: LanguageFamily? {
+        var language: Language? = self
+        var seen: Set<String> = []
+        while let current = language, seen.insert(current.code).inserted {
+            if let code = current.familyCode { return link.resolved.family(code) }
+            language = current.parent
+        }
+        return nil
+    }
 
     /// The scripts it is written in, most usual first, those the catalog knows.
     public var scripts: [Script] { scriptCodes.compactMap { link.resolved.script($0) } }

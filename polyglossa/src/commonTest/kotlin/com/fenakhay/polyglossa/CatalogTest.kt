@@ -141,4 +141,22 @@ class CatalogTest {
             .message shouldContain "no schema given for key 'Latn'"
         Catalog.EXPORTS.size shouldBe 6
     }
+
+    @Test
+    fun `a variety of a variety has the family of the nearest parent with one`() {
+        val nested =
+            Catalog.fromExports(
+                """{"en":{"1":"English","3":"gmw-ang"}}""",
+                "{}",
+                """{"en-NNN":{"1":"North American English","parent":"en"},
+                   "en-US":{"1":"American English","parent":"en-NNN"},
+                   "xx-a":{"1":"Loop A","parent":"xx-b"},"xx-b":{"1":"Loop B","parent":"xx-a"}}""",
+                """{"gmw-ang":{"1":"Anglo-Frisian"}}""",
+                "{}",
+                "{}",
+            )
+        nested["en-US"]?.family?.code shouldBe "gmw-ang"
+        nested["en-NNN"]?.family?.code shouldBe "gmw-ang"
+        nested["xx-a"]?.family shouldBe null
+    }
 }
