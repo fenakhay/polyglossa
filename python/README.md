@@ -3,6 +3,12 @@
 English Wiktionary's languages, language families and scripts for Python: every code Wiktionary uses,
 what it calls each one, and how they relate, bundled with the package so nothing is asked of the wiki.
 
+[![PyPI](https://img.shields.io/pypi/v/polyglossa)](https://pypi.org/project/polyglossa/)
+[![Python](https://img.shields.io/badge/python-3.11%2B-3776AB.svg?logo=python&logoColor=white)](https://pypi.org/project/polyglossa/)
+[![CI](https://github.com/fenakhay/polyglossa/actions/workflows/ci.yml/badge.svg)](https://github.com/fenakhay/polyglossa/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/fenakhay/polyglossa/blob/main/LICENSE)
+[![Data](https://img.shields.io/badge/data-CC%20BY--SA%204.0-lightgrey.svg)](https://github.com/fenakhay/polyglossa/blob/main/NOTICE)
+
 ```python
 from polyglossa import Language, LanguageFamily, Script
 

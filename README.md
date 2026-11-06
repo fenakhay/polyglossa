@@ -4,6 +4,16 @@ English Wiktionary's languages, language families and scripts, for Kotlin Multip
 Python, and as SQL: every code Wiktionary uses, what it calls each one, and how they relate, built into
 the library so nothing is asked of the wiki.
 
+[![Maven Central](https://img.shields.io/maven-central/v/com.fenakhay.polyglossa/polyglossa)](https://central.sonatype.com/artifact/com.fenakhay.polyglossa/polyglossa)
+[![PyPI](https://img.shields.io/pypi/v/polyglossa)](https://pypi.org/project/polyglossa/)
+[![Kotlin](https://img.shields.io/badge/kotlin-2.5.0--Beta2-7F52FF.svg?logo=kotlin)](https://kotlinlang.org)
+[![Swift](https://img.shields.io/badge/swift-5.9%2B-F05138.svg?logo=swift)](#swift)
+[![Python](https://img.shields.io/badge/python-3.11%2B-3776AB.svg?logo=python&logoColor=white)](#python)
+[![CI](https://github.com/fenakhay/polyglossa/actions/workflows/ci.yml/badge.svg)](https://github.com/fenakhay/polyglossa/actions/workflows/ci.yml)
+[![Catalog](https://github.com/fenakhay/polyglossa/actions/workflows/catalog.yml/badge.svg)](https://github.com/fenakhay/polyglossa/actions/workflows/catalog.yml)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Data](https://img.shields.io/badge/data-CC%20BY--SA%204.0-lightgrey.svg)](NOTICE)
+
 ```kotlin
 val english = Language.of("en")
 english.name                                  // "English"
@@ -32,7 +42,7 @@ Wiktionary does not have.
 
 ```kotlin
 dependencies {
-    implementation("com.fenakhay.polyglossa:polyglossa:2026.11.5")
+    implementation("com.fenakhay.polyglossa:polyglossa:2026.11.6")
 }
 ```
 
@@ -43,7 +53,7 @@ It runs on the JVM (21 and up), JavaScript and natively on macOS, Linux and Wind
 A native Swift package, for macOS 12, iOS 15, tvOS 15, watchOS 8 and Linux:
 
 ```swift
-.package(url: "https://github.com/fenakhay/polyglossa", from: "2026.11.5")
+.package(url: "https://github.com/fenakhay/polyglossa", from: "2026.11.6")
 ```
 
 ```swift
@@ -54,7 +64,7 @@ english.name                          // "English"
 english.family?.name                  // Optional("Anglic")
 Language["xx"]                        // nil
 Language.named("Old English")?.code   // Optional("ang")
-Catalog.bundled.date                  // Optional("2026-11-05")
+Catalog.bundled.date                  // Optional("2026-11-06")
 ```
 
 ## Python
@@ -100,11 +110,10 @@ copy differs. [`spec/expectations.json`](spec/expectations.json), written from t
 the catalog, lists what a sample of languages, families and scripts must answer; the Kotlin, Swift and
 Python tests all read it, so the three libraries answer alike.
 
-Polyglossa is versioned by the day its data was exported from Wiktionary: `2026.11.5` holds Wiktionary's
-languages as they were on 5 November 2026, and `Catalog.BUNDLED.date` says so at run time. A second
-release follows only a change in the data, so there is at most one a day. The API changes only through
-deprecation: what a release
-deprecates stays until a release at least a year later.
+Polyglossa is versioned by the day its data was exported from Wiktionary: `2026.11.6` holds Wiktionary's
+languages as they were on 6 November 2026, and `Catalog.BUNDLED.date` says so at run time. There is at most
+one release a day, made when the data changes or by hand (see [The data](#the-data)). The API changes only
+through deprecation: what a release deprecates stays until a release at least a year later.
 
 ## The data
 
