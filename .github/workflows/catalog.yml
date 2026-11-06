@@ -5,80 +5,7 @@ on:
     - cron: '0 6 * * 4'
   workflow_dispatch:
     inputs:
-      npm:
-    name: Publish to npm
-    needs: [fetch, tag]
-    runs-on: ubuntu-latest
-    environment: npm
-    permissions:
-      contents: read
-      id-token: write
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          ref: refs/tags/${{ needs.fetch.outputs.version }}
-
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
-        with:
-          node-version: 26
-          registry-url: https://registry.npmjs.org
-
-      - name: Build, test and publish the TypeScript package
-        working-directory: typescript
-        env:
-          VERSION: ${{ needs.fetch.outputs.version }}
-        run: |
-          test "$(node -p 'require("./package.json").version')" = "$VERSION"
-          npm ci --no-audit --no-fund
-          npm test
-          if npm view "polyglossa@$VERSION" version > /dev/null 2>&1; then
-            echo "polyglossa@$VERSION is already on npm"
-          else
-            npm publish --provenance --access public
-          fi
-
-  crates-io:
-    name: Publish to crates.io
-    needs: [fetch, tag]
-    runs-on: ubuntu-latest
-    environment: crates-io
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          ref: refs/tags/${{ needs.fetch.outputs.version }}
-
-      - name: Test and publish the Rust crate
-        working-directory: rust
-        env:
-          VERSION: ${{ needs.fetch.outputs.version }}
-          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-        run: |
-          grep -qx "version = \"$VERSION\"" Cargo.toml
-          cargo test --locked
-          if cargo info "polyglossa@$VERSION" --registry crates-io > /dev/null 2>&1; then
-            echo "polyglossa $VERSION is already on crates.io"
-          else
-            cargo publish --locked
-          fi
-
-  go-proxy:
-    name: Make the Go module known to the Go proxy
-    needs: [fetch, tag]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e
-        with:
-          go-version: stable
-          cache: false
-
-      - name: Ask the proxy for the new version
-        env:
-          VERSION: ${{ needs.fetch.outputs.version }}
-        run: |
-          GO_VERSION=$(printf 'v1.%04d%02d%02d.0' ${VERSION//./ })
-          GOPROXY=https://proxy.golang.org go list -m "fenakhay.com/polyglossa/go@$GO_VERSION"
-
-  release:
+      release:
         description: Release even if Wiktionary's data has not changed, with what CHANGELOG.md has unreleased
         type: boolean
         default: false
@@ -249,6 +176,79 @@ jobs:
       - uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086
         with:
           packages-dir: python/dist/
+
+  npm:
+    name: Publish to npm
+    needs: [fetch, tag]
+    runs-on: ubuntu-latest
+    environment: npm
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: refs/tags/${{ needs.fetch.outputs.version }}
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: 26
+          registry-url: https://registry.npmjs.org
+
+      - name: Build, test and publish the TypeScript package
+        working-directory: typescript
+        env:
+          VERSION: ${{ needs.fetch.outputs.version }}
+        run: |
+          test "$(node -p 'require("./package.json").version')" = "$VERSION"
+          npm ci --no-audit --no-fund
+          npm test
+          if npm view "polyglossa@$VERSION" version > /dev/null 2>&1; then
+            echo "polyglossa@$VERSION is already on npm"
+          else
+            npm publish --provenance --access public
+          fi
+
+  crates-io:
+    name: Publish to crates.io
+    needs: [fetch, tag]
+    runs-on: ubuntu-latest
+    environment: crates-io
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: refs/tags/${{ needs.fetch.outputs.version }}
+
+      - name: Test and publish the Rust crate
+        working-directory: rust
+        env:
+          VERSION: ${{ needs.fetch.outputs.version }}
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: |
+          grep -qx "version = \"$VERSION\"" Cargo.toml
+          cargo test --locked
+          if cargo info "polyglossa@$VERSION" --registry crates-io > /dev/null 2>&1; then
+            echo "polyglossa $VERSION is already on crates.io"
+          else
+            cargo publish --locked
+          fi
+
+  go-proxy:
+    name: Make the Go module known to the Go proxy
+    needs: [fetch, tag]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e
+        with:
+          go-version: stable
+          cache: false
+
+      - name: Ask the proxy for the new version
+        env:
+          VERSION: ${{ needs.fetch.outputs.version }}
+        run: |
+          GO_VERSION=$(printf 'v1.%04d%02d%02d.0' ${VERSION//./ })
+          GOPROXY=https://proxy.golang.org go list -m "fenakhay.com/polyglossa/go@$GO_VERSION"
 
   release:
     name: Publish the GitHub release
