@@ -5,6 +5,17 @@ Notable changes to Polyglossa, newest first.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). A version is the day the
 data was exported from Wiktionary, `year.month.day`; the API changes only through deprecation.
 
+## [Unreleased]
+
+### Added
+
+- Script detection, as Wiktionary's `findBestScript` does it: `Language.detectScript(text)` among the
+  language's scripts, and `Script.detect(text)` and `Catalog.detectScript(text)` for any language. In Swift,
+  `detectScript(_:)` and `Script.detect(_:)`; in Python, `detect_script(text)` and `Script.detect(text)`.
+- `Script.ranges`, the code points of a script from `Module:scripts/data`, with `contains` and `count`, and
+  `Script.marks`, the characters that tell Traditional from Simplified Han, from Unicode 18.0.0's Unihan.
+- `script_ranges` and `script_marks` in the SQL dump.
+
 ## [2026.11.6] — 2026-11-06
 
 ### Added

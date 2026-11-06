@@ -1,6 +1,7 @@
 public final class com/fenakhay/polyglossa/Catalog {
 	public static final field Companion Lcom/fenakhay/polyglossa/Catalog$Companion;
 	public final fun contains (Ljava/lang/String;)Z
+	public final fun detectScript (Ljava/lang/String;)Lcom/fenakhay/polyglossa/Script;
 	public final fun family (Ljava/lang/String;)Lcom/fenakhay/polyglossa/LanguageFamily;
 	public final fun get (Ljava/lang/String;)Lcom/fenakhay/polyglossa/Language;
 	public final fun getDate ()Ljava/lang/String;
@@ -11,6 +12,7 @@ public final class com/fenakhay/polyglossa/Catalog {
 	public final fun script (Ljava/lang/String;)Lcom/fenakhay/polyglossa/Script;
 	public final fun scriptNamed (Ljava/lang/String;)Lcom/fenakhay/polyglossa/Script;
 	public final fun toTsv ()Ljava/lang/String;
+	public final fun withScriptMarks (Ljava/util/Map;)Lcom/fenakhay/polyglossa/Catalog;
 }
 
 public final class com/fenakhay/polyglossa/Catalog$Companion {
@@ -24,6 +26,7 @@ public final class com/fenakhay/polyglossa/Catalog$Companion {
 
 public final class com/fenakhay/polyglossa/Language {
 	public static final field Companion Lcom/fenakhay/polyglossa/Language$Companion;
+	public final fun detectScript (Ljava/lang/String;)Lcom/fenakhay/polyglossa/Script;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getAliases ()Ljava/util/List;
 	public final fun getAncestors ()Ljava/util/List;
@@ -82,13 +85,17 @@ public final class com/fenakhay/polyglossa/LanguageType : java/lang/Enum {
 
 public final class com/fenakhay/polyglossa/Script {
 	public static final field Companion Lcom/fenakhay/polyglossa/Script$Companion;
+	public final fun contains (I)Z
+	public final fun count (Ljava/lang/String;)I
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getAliases ()Ljava/util/List;
 	public final fun getCode ()Ljava/lang/String;
 	public final fun getDirection ()Lcom/fenakhay/polyglossa/ScriptDirection;
 	public final fun getLocalNames ()Ljava/util/Map;
+	public final fun getMarks ()Ljava/util/List;
 	public final fun getName ()Ljava/lang/String;
 	public final fun getParent ()Lcom/fenakhay/polyglossa/Script;
+	public final fun getRanges ()Ljava/util/List;
 	public final fun getSystem ()Ljava/lang/String;
 	public final fun getWikidata ()Ljava/lang/String;
 	public fun hashCode ()I
@@ -98,6 +105,7 @@ public final class com/fenakhay/polyglossa/Script {
 
 public final class com/fenakhay/polyglossa/Script$Companion {
 	public final fun contains (Ljava/lang/String;)Z
+	public final fun detect (Ljava/lang/String;)Lcom/fenakhay/polyglossa/Script;
 	public final fun get (Ljava/lang/String;)Lcom/fenakhay/polyglossa/Script;
 	public final fun getAll ()Ljava/util/Collection;
 	public final fun named (Ljava/lang/String;)Lcom/fenakhay/polyglossa/Script;

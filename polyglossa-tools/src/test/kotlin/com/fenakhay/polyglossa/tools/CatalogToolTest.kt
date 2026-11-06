@@ -12,6 +12,7 @@ import kotlin.test.Test
 class CatalogToolTest {
 
     private var english = "English"
+    private var latinEnd = 122
     private var broken = false
     private var truncated = false
     private var today = "2026-11-05"
@@ -25,7 +26,9 @@ class CatalogToolTest {
         return when {
             broken -> "<strong class=\"error\">Lua error: no schema given for key &#039;Latn&#039;</strong>"
             truncated && "export_scripts" in text -> "{}"
-            "export_scripts" in text -> """{"Latn":{"1":"Latin","2":8229,"3":"alphabet"}}"""
+            "export_scripts" in text ->
+                """{"Latn":{"1":"Latin","2":8229,"3":"alphabet","ranges":[65,90,97,$latinEnd]},""" +
+                    """"Hant":{"1":"Traditional Han","ranges":[19968,40959]}}"""
             "varieties" in text -> """{"en":["Polari",["Yinglish","Yiddish English"]]}"""
             "aliases" in text -> """{"en":["Modern English"]}"""
             "export_languages" in text -> """{"en":{"1":"$english","2":1860,"4":"Latn","type":"regular"}}"""
@@ -36,7 +39,10 @@ class CatalogToolTest {
 
     private val variables = mapOf("GITHUB_OUTPUT" to "github-output", "GITHUB_STEP_SUMMARY" to "summary.md")
 
-    private val environment = Environment(::expand, { today }, output, log, variables::get, directory)
+    private var unihan = "U+4E7E\tkSimplifiedVariant\tU+5E72\nU+5E72\tkTraditionalVariant\tU+4E7E U+5E79\n"
+
+    private val environment =
+        Environment(::expand, { today }, output, log, variables::get, directory) { unihan }
 
     private fun read(file: String): String = directory.resolve(file).readText()
 
@@ -59,6 +65,46 @@ class CatalogToolTest {
     }
 
     @Test
+    fun `Unihan marks Han and the script's characters and marks are recorded and reported`() {
+        writeOrCheck(arrayOf("catalog.tsv"), environment) shouldBe 0
+        read("catalog.tsv") shouldContain "S\tLatn\tLatin\t8229\talphabet\t\t\t\t\t41-5A,61-7A"
+        read("catalog.tsv") shouldContain "S\tHant\tTraditional Han\t\t\t\t\t\t\t4E00-9FFF\t4E7E"
+
+        latinEnd = 121
+        unihan =
+            "U+4E7E\tkSimplifiedVariant\tU+5E72\nU+4E7F\tkSimplifiedVariant\tU+5E73\n" +
+                "U+5E72\tkTraditionalVariant\tU+4E7E U+5E79\n"
+        writeOrCheck(arrayOf("catalog.tsv", "--check", "--report", "report.md"), environment) shouldBe 1
+        read("report.md") shouldContain "script `Latn`: characters 52 code points → 51 code points"
+        read("report.md") shouldContain "script `Hant`: marks 1 code points → 2 code points"
+    }
+
+    @Test
+    fun `Unihan marks a character only when every other form is another character`() {
+        val variants =
+            """
+            # Unihan_Variants.txt
+            U+4E7E	kSimplifiedVariant	U+5E72
+            U+51FA	kTraditionalVariant	U+51FA U+9F63
+            U+5E72	kTraditionalVariant	U+4E7E U+5E79
+            U+8A9E	kSimplifiedVariant	U+8BED
+            U+8BED	kTraditionalVariant	U+8A9E<kMatthews
+            U+4E00	kSemanticVariant	U+5F0C
+            """
+                .trimIndent()
+        Unihan.marks(variants) shouldBe
+            mapOf("Hant" to setOf(0x4E7E, 0x8A9E), "Hans" to setOf(0x5E72, 0x8BED))
+    }
+
+    @Test
+    fun `a dump fails, writing nothing, when Unihan gives no marks`() {
+        unihan = "# nothing\n"
+        writeOrCheck(arrayOf("catalog.tsv"), environment) shouldBe 1
+        log.toString() shouldContain "refusing what looks like a broken download"
+        directory.resolve("catalog.tsv").exists() shouldBe false
+    }
+
+    @Test
     fun `the spec and the SQL are written from the catalog as it is, offline`() {
         writeOrCheck(arrayOf("catalog.tsv"), environment) shouldBe 0
         asked.clear()
@@ -77,6 +123,9 @@ class CatalogToolTest {
         sql shouldContain "INSERT INTO languages VALUES\n('en', 'English', 'regular', 'Q1860', NULL, NULL)"
         sql shouldContain "INSERT INTO varieties VALUES\n('en', 0, 'Polari'),\n('en', 1, 'Yinglish')"
         sql shouldContain "INSERT INTO metadata VALUES\n('format', '1'),\n('date', '2026-11-05')"
+        sql shouldContain
+            "INSERT INTO script_ranges VALUES\n('Hant', 19968, 40959),\n('Latn', 65, 90),\n('Latn', 97, 122)"
+        sql shouldContain "INSERT INTO script_marks VALUES\n('Hant', 20094, 20094)"
         Sql.literal("O'Brien") shouldBe "'O''Brien'"
         Sql.literal(null) shouldBe "NULL"
     }
@@ -146,7 +195,7 @@ class CatalogToolTest {
 
         truncated = true
         writeOrCheck(arrayOf("catalog.tsv"), environment) shouldBe 1
-        log.toString() shouldContain "Wiktionary exported 0 scripts where the catalog has 1"
+        log.toString() shouldContain "Wiktionary exported 0 scripts where the catalog has 2"
 
         read("catalog.tsv") shouldBe recorded
         read("github-output") shouldBe ""

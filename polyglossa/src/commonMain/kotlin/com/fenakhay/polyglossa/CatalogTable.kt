@@ -9,9 +9,10 @@ package com.fenakhay.polyglossa
  * etymology-only), Wikidata item number, family, scripts, ancestors, aliases, parent and varieties, each a
  * name and its other names joined by `|`. A family is `F`, code, name, Wikidata item number, parent,
  * proto-language and aliases. A script is `S`, code, name, Wikidata item number, writing system, aliases,
- * parent, direction (empty for left to right) and the names some languages give it, as `mr=Balbodh`. Codes
- * are joined by commas, names by semicolons; a tab, a line break, a backslash, a semicolon or a bar in a name
- * is escaped by a backslash. Empty columns at the end of a line are left off.
+ * parent, direction (empty for left to right), the names some languages give it, as `mr=Balbodh`, its
+ * characters and its marks, both as ranges of hexadecimal code points such as `41-5A,61-7A,AA`. Codes are
+ * joined by commas, names by semicolons; a tab, a line break, a backslash, a semicolon or a bar in a name is
+ * escaped by a backslash. Empty columns at the end of a line are left off.
  */
 internal object CatalogTable {
     const val HEADER: String = "polyglossa\t1"
@@ -19,6 +20,7 @@ internal object CatalogTable {
     private const val LANGUAGE = "L"
     private const val FAMILY = "F"
     private const val SCRIPT = "S"
+    private const val HEX = 16
     private val DIRECTIONS =
         mapOf(
             ScriptDirection.LEFT_TO_RIGHT to "",
@@ -109,6 +111,8 @@ internal object CatalogTable {
             script.localNameCodes.entries
                 .sortedBy { it.key }
                 .joinToString(";") { [language, name] -> "$language=${escape(name)}" },
+            hex(script.ranges),
+            hex(script.marks),
         )
 
     private fun cells(vararg values: String): String = values.joinToString("\t").trimEnd('\t')
@@ -163,7 +167,22 @@ internal object CatalogTable {
             direction = Catalog.direction(cells.next()),
             localNameCodes =
                 names(cells.next()).associate { it.substringBefore('=') to it.substringAfter('=') },
+            ranges = ranges(cells.next()),
+            marks = ranges(cells.next()),
         )
+
+    /** [ranges] as [ranges] reads them back: `41-5A,AA`. */
+    private fun hex(ranges: List<IntRange>): String =
+        ranges.joinToString(",") { range ->
+            val first = range.first.toString(HEX).uppercase()
+            if (range.first == range.last) first else "$first-${range.last.toString(HEX).uppercase()}"
+        }
+
+    private fun ranges(cell: String): List<IntRange> =
+        codes(cell).map { range ->
+            val first = range.substringBefore('-').toInt(HEX)
+            first..(range.substringAfter('-', "").ifEmpty { null }?.toInt(HEX) ?: first)
+        }
 
     private fun codes(cell: String): List<String> = if (cell.isEmpty()) emptyList() else cell.split(',')
 

@@ -67,6 +67,19 @@ class ParityTest(unittest.TestCase):
                 self.assertEqual(script.parent.code if script.parent else None, expected["parent"])
                 self.assertEqual(script.direction.value, expected["direction"])
                 self.assertEqual({l.code: n for l, n in script.local_names.items()}, expected["localNames"])
+                self.assertEqual(sum(len(r) for r in script.ranges), expected["characters"])
+                self.assertEqual(len(script.ranges), expected["ranges"])
+                self.assertEqual(sum(len(r) for r in script.marks), expected["marks"])
+
+    def test_detections(self):
+        for expected in SPEC["detections"]:
+            with self.subTest(expected["text"]):
+                code = expected["language"]
+                script = Language[code].detect_script(expected["text"]) if code else Script.detect(expected["text"])
+                self.assertEqual(script.code if script else None, expected["script"])
+        self.assertIn(0x416, Script["Cyrl"])
+        self.assertNotIn(0x41, Script["Cyrl"])
+        self.assertEqual(Script["Arab"].count("كتاب abc"), 4)
 
     def test_lookups_read_as_python(self):
         with self.assertRaises(UnknownLanguageError):

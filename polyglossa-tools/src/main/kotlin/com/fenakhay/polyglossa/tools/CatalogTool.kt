@@ -35,9 +35,10 @@ import kotlinx.serialization.json.jsonPrimitive
  * it, prints what changed, and exits 1 when anything did. `--report <file>` keeps the report as well as
  * printing it. `--exports <dir>` reads the six exports from `languages.json`, `aliases.json`,
  * `etymology.json`, `families.json`, `scripts.json` and `varieties.json` there, as `Module:JSON data` wrote
- * them, instead of asking the wiki. `--spec <file>` writes what every implementation must answer from the
- * catalog, and `--sql <file>` the catalog as SQL; with `--offline`, they are written from the file as it is,
- * which is left alone.
+ * them, instead of asking the wiki. The marks that tell Traditional from Simplified Han come from Unihan,
+ * downloaded from unicode.org, or with `--unihan <file>` from a Unihan.zip or `Unihan_Variants.txt` there.
+ * `--spec <file>` writes what every implementation must answer from the catalog, and `--sql <file>` the
+ * catalog as SQL; with `--offline`, they are written from the file as it is, which is left alone.
  *
  * Without `--check`, the file is rewritten only when what Wiktionary exports differs from it, so its date,
  * and so the version, moves only with the data. Then `--report <file>` gets the release notes, and
@@ -61,6 +62,7 @@ public fun main(args: Array<String>) {
  * @property log where failures go.
  * @property variables the value of an environment variable, or `null`.
  * @property workingDirectory the directory a relative path is taken from.
+ * @property unihan Unihan's `Unihan_Variants.txt`, downloaded.
  */
 internal class Environment(
     val expand: (String) -> String,
@@ -69,6 +71,7 @@ internal class Environment(
     val log: Appendable,
     val variables: (String) -> String?,
     val workingDirectory: Path,
+    val unihan: () -> String,
 ) {
     companion object {
         val SYSTEM: Environment =
@@ -79,6 +82,7 @@ internal class Environment(
                 log = System.err,
                 variables = System::getenv,
                 workingDirectory = Path(""),
+                unihan = Unihan::download,
             )
     }
 }
@@ -130,7 +134,7 @@ internal class Wiktionary {
 
 /** What [main] does with [args], printing through [environment]: the status to exit with. */
 internal fun writeOrCheck(args: Array<String>, environment: Environment): Int {
-    val valued = setOf("--report", "--exports", "--spec", "--sql", "--changelog")
+    val valued = setOf("--report", "--exports", "--spec", "--sql", "--changelog", "--unihan")
     val named = args.toList().windowed(2).filter { [key, _] -> key in valued }.associate { [k, v] -> k to v }
     val positional = args.filterIndexed { i, arg ->
         !arg.startsWith("--") && args.getOrNull(i - 1) !in valued
@@ -141,9 +145,14 @@ internal fun writeOrCheck(args: Array<String>, environment: Environment): Int {
     val current =
         if (offline) Catalog.fromTsv(target.readText())
         else
-            read(named["--exports"]?.let(environment.workingDirectory::resolve), environment).getOrElse {
-                return failed(it.message.orEmpty(), environment, report)
-            }
+            read(
+                    named["--exports"]?.let(environment.workingDirectory::resolve),
+                    named["--unihan"]?.let(environment.workingDirectory::resolve),
+                    environment,
+                )
+                .getOrElse {
+                    return failed(it.message.orEmpty(), environment, report)
+                }
 
     if ("--check" !in args) {
         val kept =
@@ -281,16 +290,20 @@ private fun Environment.appendTo(variable: String, text: String) {
         }
 }
 
-/** The catalog in [exports] when given, or else the one Wiktionary has now, or why it could not be read. */
-private fun read(exports: Path?, environment: Environment): Result<Catalog> =
+/**
+ * The catalog in [exports] when given, or else the one Wiktionary has now, with the marks of Han from
+ * [unihan] or else Unihan as unicode.org has it, or why it could not be read.
+ */
+private fun read(exports: Path?, unihan: Path?, environment: Environment): Result<Catalog> =
     try {
-        Result.success(
+        val catalog =
             Catalog.fromExports(
                 if (exports != null) EXPORT_FILES.map { exports.resolve(it).readText() }
                 else Catalog.EXPORTS.map(environment.expand),
                 environment.today(),
             )
-        )
+        val variants = if (unihan != null) Unihan.read(unihan) else environment.unihan()
+        Result.success(catalog.withScriptMarks(Unihan.marks(variants)))
     } catch (e: IOException) {
         Result.failure(IllegalStateException("could not read Wiktionary's exports: ${e.message}", e))
     } catch (e: IllegalStateException) {
@@ -457,8 +470,15 @@ internal class CatalogChanges(
                     "parent" to (before.parent?.code to after.parent?.code),
                     "direction" to (before.direction to after.direction),
                     "local names" to (localNames(before) to localNames(after)),
+                    "characters" to (Characters(before.ranges) to Characters(after.ranges)),
+                    "marks" to (Characters(before.marks) to Characters(after.marks)),
                 )
             return differences("script `${after.code}`", fields)
+        }
+
+        /** Some characters, told apart by [ranges] and written as how many there are. */
+        private data class Characters(val ranges: List<IntRange>) {
+            override fun toString(): String = "${ranges.sumOf { it.count() }} code points"
         }
 
         private fun localNames(script: Script): List<String> =

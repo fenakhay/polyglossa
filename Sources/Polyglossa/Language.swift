@@ -86,6 +86,23 @@ public final class Language: Hashable, CustomStringConvertible, @unchecked Senda
         return language
     }
 
+    /// The script `text` is written in, among this language's ``scripts``, as Wiktionary's `findBestScript`
+    /// finds it, or `nil` when none of them has any of its characters.
+    ///
+    /// Spaces and ASCII punctuation are left out, and the scripts are tried in order: the first that has every
+    /// character wins, or else the one with the most of them, the earlier on a tie. Chinese and the other
+    /// languages written in Han give Traditional or Simplified Han when more of the characters mark one than the
+    /// other, and Han when as many mark each. A language written in every script finds it as
+    /// ``Catalog/detectScript(_:)`` does, and an etymology-only variety with no scripts of its own uses its
+    /// language's. Pass plain text: wiki markup counts as characters.
+    ///
+    /// ```swift
+    /// try Language.of("sh").detectScript("Москва")?.code   // "Cyrl"
+    /// try Language.of("zh").detectScript("語言")?.code      // "Hant"
+    /// try Language.of("en").detectScript("123")            // nil
+    /// ```
+    public func detectScript(_ text: String) -> Script? { link.resolved.detectScript(self, text) }
+
     public static func == (left: Language, right: Language) -> Bool {
         left.code == right.code && left.name == right.name && left.type == right.type
             && left.wikidata == right.wikidata && left.familyCode == right.familyCode

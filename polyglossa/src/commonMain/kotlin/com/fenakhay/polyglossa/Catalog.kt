@@ -85,8 +85,49 @@ internal constructor(
     /** The script called [name], or `null`; one that is no variety of another wins over one that is. */
     public fun scriptNamed(name: String): Script? = scriptsByName[name.trim()]
 
+    /** The codes of every script. */
+    internal val scriptCodes: Set<String>
+        get() = scriptsByCode.keys
+
+    private val detection by lazy { ScriptDetection(this) }
+
+    /**
+     * The script [text] is written in, whatever its language, as Wiktionary's `findBestScriptWithoutLang`
+     * finds it: the one most of its characters belong to, or `null` when more of them belong to no script. A
+     * tie goes to a script that holds no other whole, as Greek does beside Polytonic Greek, then to a script
+     * over notation such as `Zmth`, then to the one with the most characters, as Han is beside Latin, then to
+     * one that is no variety of another, as Latin is beside Fraktur. [Language.detectScript] knows better
+     * when the language is known.
+     *
+     * ```
+     * Catalog.BUNDLED.detectScript("Ελληνικά")     // Greek (Grek)
+     * Catalog.BUNDLED.detectScript("ひらがな漢字")    // Japanese (Jpan)
+     * Catalog.BUNDLED.detectScript("2026")         // null
+     * ```
+     */
+    public fun detectScript(text: String): Script? = detection.detect(text)
+
+    /** The script of [text] in [language]; see [Language.detectScript]. */
+    internal fun detectScript(language: Language, text: String): Script? = detection.detect(language, text)
+
     /** The languages directly in the family with [code]. */
     internal fun inFamily(code: String): List<Language> = byFamily[code].orEmpty()
+
+    /**
+     * This catalog with [marks] as the characters that tell some scripts from the others with the same
+     * characters, by script code: for `Hant`, the Han characters Unihan simplifies, and for `Hans`, those it
+     * gives a traditional form. [Language.detectScript] reads them; the tool that records [BUNDLED] adds them
+     * from Unihan. A script not in [marks] keeps the marks it has.
+     */
+    public fun withScriptMarks(marks: Map<String, Collection<Int>>): Catalog =
+        Catalog(
+            byCode.values.map { it.copy() },
+            familiesByCode.values.map { it.copy() },
+            scriptsByCode.values.map { script ->
+                script.copy(marks = marks[script.code]?.let(::rangesOf) ?: script.marks)
+            },
+            date,
+        )
 
     /**
      * This catalog as tab-separated lines, for [fromTsv] to read back: a language or a family to a line,
@@ -123,7 +164,7 @@ internal constructor(
         private const val EXPORT_ETYMOLOGY = "{{#invoke:JSON data|export_etymology_languages}}"
         private const val EXPORT_FAMILIES = "{{#invoke:JSON data|export_families}}"
         private const val EXPORT_SCRIPTS =
-            "{{#invoke:JSON data|export_scripts||1|2|3|aliases|parent|direction}}"
+            "{{#invoke:JSON data|export_scripts||1|2|3|aliases|parent|direction|ranges}}"
         private const val EXPORT_VARIETIES = "{{#invoke:JSON data|export_languages||varieties}}"
         private const val FIRST_EXPORTS = 3
         private const val DEFAULT_NAME = "default"
@@ -132,8 +173,8 @@ internal constructor(
          * The data `Module:JSON data` exported: [languages] with the keys `1`, `2`, `3`, `4`, `type` and
          * `ancestors`, [aliases] with `aliases` alone, [etymology] from `export_etymology_languages`,
          * [families] from `export_families`, [scripts] from `export_scripts` with the keys `1`, `2`, `3`,
-         * `aliases`, `parent` and `direction`, and [varieties] from `export_languages` with `varieties`
-         * alone, each the JSON text the module wrote.
+         * `aliases`, `parent`, `direction` and `ranges`, and [varieties] from `export_languages` with
+         * `varieties` alone, each the JSON text the module wrote.
          *
          * @throws IllegalStateException when one of them is the error the module wrote instead, with what it
          *   said.
@@ -292,7 +333,32 @@ internal constructor(
                 parentCode = text(fields["parent"]),
                 direction = direction(text(fields["direction"])),
                 localNameCodes = localNames.toMap(),
+                ranges = ranges(fields["ranges"]),
             )
+        }
+
+        /** The ranges [element] lists as code points, first and last of each in turn, sorted and joined. */
+        private fun ranges(element: JsonElement?): List<IntRange> =
+            (element as? JsonArray)
+                .orEmpty()
+                .mapNotNull { (it as? JsonPrimitive)?.longOrNull?.toInt() }
+                .chunked(2)
+                .filter { it.size == 2 }
+                .map { [first, last] -> first..last }
+                .let(::joined)
+
+        /** [ranges] sorted, with those that overlap or touch made one. */
+        internal fun joined(ranges: List<IntRange>): List<IntRange> {
+            val joined = mutableListOf<IntRange>()
+            for (range in ranges.filterNot { it.isEmpty() }.sortedBy { it.first }) {
+                val last = joined.lastOrNull()
+                if (last != null && range.first <= last.last + 1) {
+                    joined[joined.lastIndex] = last.first..maxOf(last.last, range.last)
+                } else {
+                    joined += range
+                }
+            }
+            return joined
         }
 
         internal fun direction(written: String?): ScriptDirection =

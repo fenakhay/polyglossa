@@ -67,7 +67,25 @@ final class ParityTests: XCTestCase {
             XCTAssertEqual(script.direction.rawValue, text(expected["direction"]))
             let local = Dictionary(uniqueKeysWithValues: script.localNames.map { ($0.key.code, $0.value) })
             XCTAssertEqual(local, (expected["localNames"] as? [String: String]) ?? [:], script.code)
+            XCTAssertEqual(script.ranges.reduce(0) { $0 + $1.count }, expected["characters"] as? Int, script.code)
+            XCTAssertEqual(script.ranges.count, expected["ranges"] as? Int, script.code)
+            XCTAssertEqual(script.marks.reduce(0) { $0 + $1.count }, expected["marks"] as? Int, script.code)
         }
+    }
+
+    func testDetections() throws {
+        for expected in try XCTUnwrap(try spec()["detections"] as? [[String: Any]]) {
+            let text = try XCTUnwrap(self.text(expected["text"]))
+            let script: Script?
+            if let code = self.text(expected["language"]) {
+                script = try Language.of(code).detectScript(text)
+            } else {
+                script = Script.detect(text)
+            }
+            XCTAssertEqual(script?.code, self.text(expected["script"]), text)
+        }
+        XCTAssertTrue(try Script.of("Cyrl").contains(0x416))
+        XCTAssertEqual(try Script.of("Arab").count("كتاب abc"), 4)
     }
 
     func testLookupsReadAsSwift() throws {

@@ -42,6 +42,7 @@ public final class Catalog: @unchecked Sendable {
     private let byName: [String: Language]
     private let scriptsByName: [String: Script]
     private let byFamily: [String: [Language]]
+    private let detection: ScriptDetection
 
     /// Every language and etymology-only variety, sorted by code.
     public var languages: [Language] { byCode.values.sorted { $0.code < $1.code } }
@@ -68,6 +69,7 @@ public final class Catalog: @unchecked Sendable {
         scriptsByName = scriptNames
         byFamily = Dictionary(grouping: byCode.values.filter { $0.familyCode != nil }, by: { $0.familyCode! })
             .mapValues { $0.sorted { $0.code < $1.code } }
+        detection = ScriptDetection(scripts: scriptsByCode)
         link.catalog = self
     }
 
@@ -89,6 +91,16 @@ public final class Catalog: @unchecked Sendable {
 
     /// The script called `name`; one that is no variety of another wins over one that is.
     public func scriptNamed(_ name: String) -> Script? { scriptsByName[name.trimmingCharacters(in: .whitespaces)] }
+
+    /// The script `text` is written in, whatever its language, as Wiktionary's `findBestScriptWithoutLang`
+    /// finds it: the one most of its characters belong to, or `nil` when more of them belong to no script. A tie
+    /// goes to a script that holds no other whole, as Greek does beside Polytonic Greek, then to a script over
+    /// notation such as `Zmth`, then to the one with the most characters, as Han is beside Latin, then to one
+    /// that is no variety of another.
+    /// ``Language/detectScript(_:)`` knows better when the language is known.
+    public func detectScript(_ text: String) -> Script? { detection.detect(text) }
+
+    func detectScript(_ language: Language, _ text: String) -> Script? { detection.detect(language, text) }
 
     func inFamily(_ code: String) -> [Language] { byFamily[code] ?? [] }
 }

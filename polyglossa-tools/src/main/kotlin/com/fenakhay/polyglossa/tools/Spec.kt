@@ -15,7 +15,8 @@ import kotlinx.serialization.json.buildJsonObject
 
 /**
  * What every implementation of Polyglossa must answer from the same `catalog.tsv`: a sample of languages,
- * families and scripts with every field and link, lookups by name, codes that must miss, and the counts.
+ * families and scripts with every field and link, lookups by name, codes that must miss, the counts, and the
+ * script detected for some texts, in a language or in none.
  *
  * Written from the Kotlin library whenever the catalog is, so the Swift and Python packages are held to what
  * it reads.
@@ -27,6 +28,38 @@ internal object Spec {
     private val SCRIPTS = listOf("Latn", "Arab", "Aran", "Hans", "Deva", "Mong", "Hani")
     private val NAMES = listOf("English", "Old English", "Proto-Indo-European", "Arabic")
     private val MISSING = listOf("xx-none", "", "EN")
+    private val DETECTIONS =
+        listOf(
+            "sh" to "Moskva",
+            "sh" to "Москва",
+            "sh" to "Москва Moskva",
+            "ru" to "«Москва»!",
+            "ru" to "Moskva",
+            "en" to "123",
+            "en" to "",
+            "en-ear" to "word",
+            "ur" to "کتاب",
+            "pa" to "پنجاب",
+            "zh" to "語言",
+            "zh" to "语言",
+            "zh" to "中文",
+            "zh" to "中abc",
+            "ja" to "ひらがな",
+            "ko" to "한국어",
+            "grc" to "λόγος",
+            "el" to "λόγος",
+            "got" to "𐌲𐌿𐍄𐌰",
+            "mul" to "ab12345",
+            null to "Ελληνικά",
+            null to "東京",
+            null to "ひらがな漢字",
+            null to "ひらがな",
+            null to "한국어",
+            null to "アbc",
+            null to "Москва 2026",
+            null to "𞤀𞤁",
+            null to "123",
+        )
 
     private val pretty = Json { prettyPrint = true }
 
@@ -51,6 +84,22 @@ internal object Spec {
                     buildJsonObject { NAMES.forEach { name -> put(name, text(catalog.named(name)?.code)) } },
                 )
                 put("missing", strings(MISSING.filter { catalog[it] == null }))
+                put(
+                    "detections",
+                    JsonArray(
+                        DETECTIONS.map { [code, text] ->
+                            val language = code?.let { catalog[it] }
+                            val script =
+                                if (language != null) language.detectScript(text)
+                                else catalog.detectScript(text)
+                            buildJsonObject {
+                                put("language", text(code))
+                                put("text", JsonPrimitive(text))
+                                put("script", text(script?.code))
+                            }
+                        }
+                    ),
+                )
             },
         ) + "\n"
 
@@ -93,6 +142,9 @@ internal object Spec {
         put("aliases", strings(script.aliases))
         put("parent", text(script.parent?.code))
         put("direction", JsonPrimitive(script.direction.word))
+        put("characters", JsonPrimitive(script.ranges.sumOf { it.count() }))
+        put("ranges", JsonPrimitive(script.ranges.size))
+        put("marks", JsonPrimitive(script.marks.sumOf { it.count() }))
         put(
             "localNames",
             buildJsonObject {

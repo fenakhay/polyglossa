@@ -25,6 +25,8 @@ public enum class ScriptDirection {
  * Script.of("Hans").parent?.name         // "Han"
  * Language.of("en").scripts.first()      // Latin (Latn)
  * Script.of("Deva").nameFor(Language.of("mr"))   // "Balbodh"
+ * Script.detect("Ελληνικά")              // Greek (Grek)
+ * 0x416 in Script.of("Cyrl")             // true
  * ```
  *
  * @property code its code, such as `Latn`, `Arab` or `fa-Arab`.
@@ -36,6 +38,11 @@ public enum class ScriptDirection {
  * @property direction which way it runs.
  * @param localNameCodes the names some languages give it instead of [name], by language code, which
  *   [localNames] and [nameFor] read.
+ * @property ranges the code points it is made of, as `Module:scripts/data` lists them, in order; empty for a
+ *   script Unicode does not encode.
+ * @property marks the code points that tell it from the other scripts with the same [ranges]: for Traditional
+ *   Han, the characters Unihan simplifies, and for Simplified Han, those it gives a traditional form; empty
+ *   for most scripts.
  */
 public class Script
 internal constructor(
@@ -47,6 +54,8 @@ internal constructor(
     internal val parentCode: String? = null,
     public val direction: ScriptDirection = ScriptDirection.LEFT_TO_RIGHT,
     internal val localNameCodes: Map<String, String> = emptyMap(),
+    public val ranges: List<IntRange> = emptyList(),
+    public val marks: List<IntRange> = emptyList(),
 ) {
     /** The catalog this script was read into, whose scripts its links lead to. */
     internal var catalog: Catalog? = null
@@ -70,6 +79,23 @@ internal constructor(
                 }
                 .toMap()
 
+    /** Whether [codePoint] is one of its characters. */
+    public operator fun contains(codePoint: Int): Boolean = ranges.holds(codePoint)
+
+    /** How many of the characters of [text] are its own, counting each code point once. */
+    public fun count(text: String): Int {
+        var count = 0
+        text.forEachCodePoint { if (it in this) count++ }
+        return count
+    }
+
+    /** A copy for another catalog with [marks], linked to nothing yet. */
+    internal fun copy(marks: List<IntRange> = this.marks): Script =
+        Script(code, name, wikidata, system, aliases, parentCode, direction, localNameCodes, ranges, marks)
+
+    /** Whether [codePoint] is one of [marks]. */
+    internal fun isMark(codePoint: Int): Boolean = marks.holds(codePoint)
+
     override fun equals(other: Any?): Boolean =
         other is Script &&
             code == other.code &&
@@ -79,7 +105,9 @@ internal constructor(
             aliases == other.aliases &&
             parentCode == other.parentCode &&
             direction == other.direction &&
-            localNameCodes == other.localNameCodes
+            localNameCodes == other.localNameCodes &&
+            ranges == other.ranges &&
+            marks == other.marks
 
     override fun hashCode(): Int = code.hashCode() * HASH + name.hashCode()
 
@@ -110,6 +138,9 @@ internal constructor(
         /** Every script. */
         public val all: Collection<Script>
             get() = Catalog.BUNDLED.scripts
+
+        /** The script [text] is written in, whatever its language, or `null`; see [Catalog.detectScript]. */
+        public fun detect(text: String): Script? = Catalog.BUNDLED.detectScript(text)
     }
 }
 

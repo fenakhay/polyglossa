@@ -605,6 +605,9 @@
             ],
             "parent": null,
             "direction": "ltr",
+            "characters": 1748,
+            "ranges": 52,
+            "marks": 0,
             "localNames": {}
         },
         {
@@ -615,6 +618,9 @@
             "aliases": [],
             "parent": null,
             "direction": "rtl",
+            "characters": 1500,
+            "ranges": 48,
+            "marks": 0,
             "localNames": {}
         },
         {
@@ -628,6 +634,9 @@
             ],
             "parent": "Arab",
             "direction": "rtl",
+            "characters": 1500,
+            "ranges": 48,
+            "marks": 0,
             "localNames": {
                 "hnd": "Shahmukhi",
                 "hno": "Shahmukhi",
@@ -646,6 +655,9 @@
             "aliases": [],
             "parent": "Hani",
             "direction": "ltr",
+            "characters": 103665,
+            "ranges": 40,
+            "marks": 6410,
             "localNames": {}
         },
         {
@@ -656,6 +668,9 @@
             "aliases": [],
             "parent": null,
             "direction": "ltr",
+            "characters": 223,
+            "ranges": 7,
+            "marks": 0,
             "localNames": {
                 "ahr": "Balbodh",
                 "kfq": "Balbodh",
@@ -676,6 +691,9 @@
             ],
             "parent": null,
             "direction": "vertical-ltr",
+            "characters": 102,
+            "ranges": 12,
+            "marks": 0,
             "localNames": {}
         },
         {
@@ -686,6 +704,9 @@
             "aliases": [],
             "parent": null,
             "direction": "ltr",
+            "characters": 103665,
+            "ranges": 40,
+            "marks": 0,
             "localNames": {}
         }
     ],
@@ -699,5 +720,152 @@
         "xx-none",
         "",
         "EN"
+    ],
+    "detections": [
+        {
+            "language": "sh",
+            "text": "Moskva",
+            "script": "Latn"
+        },
+        {
+            "language": "sh",
+            "text": "Москва",
+            "script": "Cyrl"
+        },
+        {
+            "language": "sh",
+            "text": "Москва Moskva",
+            "script": "Latn"
+        },
+        {
+            "language": "ru",
+            "text": "«Москва»!",
+            "script": "Cyrl"
+        },
+        {
+            "language": "ru",
+            "text": "Moskva",
+            "script": null
+        },
+        {
+            "language": "en",
+            "text": "123",
+            "script": null
+        },
+        {
+            "language": "en",
+            "text": "",
+            "script": null
+        },
+        {
+            "language": "en-ear",
+            "text": "word",
+            "script": "Latn"
+        },
+        {
+            "language": "ur",
+            "text": "کتاب",
+            "script": "Aran"
+        },
+        {
+            "language": "pa",
+            "text": "پنجاب",
+            "script": "Aran"
+        },
+        {
+            "language": "zh",
+            "text": "語言",
+            "script": "Hant"
+        },
+        {
+            "language": "zh",
+            "text": "语言",
+            "script": "Hans"
+        },
+        {
+            "language": "zh",
+            "text": "中文",
+            "script": "Hani"
+        },
+        {
+            "language": "zh",
+            "text": "中abc",
+            "script": "Hani"
+        },
+        {
+            "language": "ja",
+            "text": "ひらがな",
+            "script": "Jpan"
+        },
+        {
+            "language": "ko",
+            "text": "한국어",
+            "script": "Kore"
+        },
+        {
+            "language": "grc",
+            "text": "λόγος",
+            "script": "Polyt"
+        },
+        {
+            "language": "el",
+            "text": "λόγος",
+            "script": "Grek"
+        },
+        {
+            "language": "got",
+            "text": "𐌲𐌿𐍄𐌰",
+            "script": "Goth"
+        },
+        {
+            "language": "mul",
+            "text": "ab12345",
+            "script": null
+        },
+        {
+            "language": null,
+            "text": "Ελληνικά",
+            "script": "Grek"
+        },
+        {
+            "language": null,
+            "text": "東京",
+            "script": "Hani"
+        },
+        {
+            "language": null,
+            "text": "ひらがな漢字",
+            "script": "Jpan"
+        },
+        {
+            "language": null,
+            "text": "ひらがな",
+            "script": "Hira"
+        },
+        {
+            "language": null,
+            "text": "한국어",
+            "script": "Hang"
+        },
+        {
+            "language": null,
+            "text": "アbc",
+            "script": "Latn"
+        },
+        {
+            "language": null,
+            "text": "Москва 2026",
+            "script": "Cyrl"
+        },
+        {
+            "language": null,
+            "text": "𞤀𞤁",
+            "script": "Adlm"
+        },
+        {
+            "language": null,
+            "text": "123",
+            "script": null
+        }
     ]
 }

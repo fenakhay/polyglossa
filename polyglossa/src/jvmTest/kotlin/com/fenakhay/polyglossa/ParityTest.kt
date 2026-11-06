@@ -79,6 +79,19 @@ class ParityTest {
             word(script.direction) shouldBe expected.getValue("direction").text()
             script.localNames.mapKeys { it.key.code } shouldBe
                 (expected.getValue("localNames") as JsonObject).mapValues { it.value.text() }
+            script.ranges.sumOf { it.count() } shouldBe expected.getValue("characters").jsonPrimitive.int
+            script.ranges.size shouldBe expected.getValue("ranges").jsonPrimitive.int
+            script.marks.sumOf { it.count() } shouldBe expected.getValue("marks").jsonPrimitive.int
+        }
+    }
+
+    @Test
+    fun `every text is detected as in the script the spec gives it`() {
+        for (expected in spec.getValue("detections").jsonArray.map { it.jsonObject }) {
+            val text = checkNotNull(expected.getValue("text").text())
+            val language = expected.getValue("language").text()?.let { checkNotNull(catalog[it]) }
+            val script = if (language != null) language.detectScript(text) else catalog.detectScript(text)
+            script?.code shouldBe expected.getValue("script").text()
         }
     }
 

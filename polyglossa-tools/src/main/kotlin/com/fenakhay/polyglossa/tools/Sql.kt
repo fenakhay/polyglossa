@@ -7,7 +7,10 @@ import com.fenakhay.polyglossa.Catalog
  * read. `sqlite3 polyglossa.sqlite < polyglossa.sql` makes a database of it.
  *
  * Every list a language, a family or a script holds is a table of its own with a `position`, so its order is
- * kept: a language's scripts, most usual first, are `language_scripts` ordered by `position`.
+ * kept: a language's scripts, most usual first, are `language_scripts` ordered by `position`. A script's
+ * characters are `script_ranges`, each a first and a last code point, so the scripts that hold U+0416 are
+ * `SELECT script FROM script_ranges WHERE 1046 BETWEEN first AND last`; `script_marks` holds, the same way,
+ * the characters that tell Traditional from Simplified Han.
  */
 internal object Sql {
     private const val ROWS_PER_INSERT = 400
@@ -54,8 +57,13 @@ internal object Sql {
             PRIMARY KEY (script, position));
         CREATE TABLE script_local_names (script TEXT NOT NULL, language TEXT NOT NULL, name TEXT NOT NULL,
             PRIMARY KEY (script, language));
+        CREATE TABLE script_ranges (script TEXT NOT NULL, first INTEGER NOT NULL, last INTEGER NOT NULL,
+            PRIMARY KEY (script, first));
+        CREATE TABLE script_marks (script TEXT NOT NULL, first INTEGER NOT NULL, last INTEGER NOT NULL,
+            PRIMARY KEY (script, first));
         CREATE INDEX languages_by_name ON languages (name);
         CREATE INDEX languages_by_family ON languages (family);
+        CREATE INDEX script_ranges_by_first ON script_ranges (first);
         """
             .trimIndent()
 
@@ -142,6 +150,8 @@ internal object Sql {
                 .forEach { [language, name] ->
                     add("script_local_names", listOf(script.code, language.code, name))
                 }
+            script.ranges.forEach { add("script_ranges", listOf(script.code, it.first, it.last)) }
+            script.marks.forEach { add("script_marks", listOf(script.code, it.first, it.last)) }
         }
     }
 

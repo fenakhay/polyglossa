@@ -1,6 +1,7 @@
 /// Reads the tab-separated `catalog.tsv` the Kotlin library writes: a header, `polyglossa`, the format and the
 /// day the data was exported, then a language (`L`), a family (`F`) or a script (`S`) to a line. Codes are
-/// joined by commas, names by semicolons, a variety's names by bars; a tab, a line break, a backslash, a
+/// joined by commas, names by semicolons, a variety's names by bars, a script's characters and marks as ranges
+/// of hexadecimal code points such as `41-5A,61-7A,AA`; a tab, a line break, a backslash, a
 /// semicolon or a bar in a name is escaped by a backslash.
 enum CatalogTable {
     static let header = "polyglossa\t1"
@@ -19,6 +20,7 @@ enum CatalogTable {
     struct ScriptRow {
         let code: String, name: String, wikidata: String?, system: String?, aliases: [String]
         let parentCode: String?, direction: ScriptDirection, localNames: [String: String]
+        let ranges: [ClosedRange<Int>], marks: [ClosedRange<Int>]
     }
 
     struct Table {
@@ -109,8 +111,20 @@ enum CatalogTable {
                 localNames[String(entry[..<equals])] = String(entry[entry.index(after: equals)...])
             }
         }
+        let characters = codePoints(cells.next())
+        let marks = codePoints(cells.next())
         return ScriptRow(code: code, name: name, wikidata: wikidata, system: system, aliases: aliases,
-                         parentCode: parent, direction: direction, localNames: localNames)
+                         parentCode: parent, direction: direction, localNames: localNames, ranges: characters,
+                         marks: marks)
+    }
+
+    /// The ranges of hexadecimal code points in `cell`, as `41-5A,AA`.
+    private static func codePoints(_ cell: String) -> [ClosedRange<Int>] {
+        codes(cell).compactMap { range in
+            let ends = range.split(separator: "-").compactMap { Int($0, radix: 16) }
+            guard let first = ends.first else { return nil }
+            return first...(ends.count > 1 ? ends[1] : first)
+        }
     }
 
     private static func optional(_ cell: String) -> String? { cell.isEmpty ? nil : cell }

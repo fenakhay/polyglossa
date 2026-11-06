@@ -38,6 +38,37 @@ Links between languages, families and scripts are the objects themselves: `famil
 `parent`, `full`, `scripts`, `protoLanguage`. Lookups that may miss return `null`; `of` throws for a code
 Wiktionary does not have.
 
+## Detecting scripts
+
+Polyglossa tells which script a text is in the way Wiktionary's `findBestScript` does, from the
+characters each script has in `Module:scripts`, so a bot can fill `sc=` or catch a term tagged with the
+wrong script without asking the wiki:
+
+```kotlin
+Language.of("sh").detectScript("Москва")    // Cyrillic (Cyrl)
+Language.of("sh").detectScript("Moskva")    // Latin (Latn)
+Language.of("zh").detectScript("語言")       // Traditional Han (Hant)
+Language.of("zh").detectScript("语言")       // Simplified Han (Hans)
+Language.of("ja").detectScript("ひらがな")   // Japanese (Jpan)
+Language.of("en").detectScript("123")       // null
+Script.detect("Ελληνικά")                   // Greek (Grek), whatever the language
+0x416 in Script.of("Cyrl")                  // true
+Script.of("Arab").count("كتاب abc")          // 4
+```
+
+With a language, its scripts are tried in order: the first that has every character wins, or else the one
+with the most of them. Spaces and ASCII punctuation don't count. Without one, the script most of the
+characters belong to wins, and the result is `null` when more of them belong to no script.
+
+Traditional and Simplified Han are told apart by [Unihan](https://www.unicode.org/reports/tr38/)'s
+variants rather than by Wiktionary's own lists, so a character both forms share, such as 后 or 干, counts
+for neither. Checked against Wiktionary on 1,008 lemmas from 32 languages, with and without their
+language, it answered the same for all but three: two such Han characters, and ↓, which Wiktionary's
+precomputed table puts in a script whose characters no longer hold it.
+
+Swift has `detectScript(_:)` and `Script.detect(_:)`, and Python has `detect_script(text)` and
+`Script.detect(text)`, with the same answers.
+
 ## Install
 
 ```kotlin
@@ -90,7 +121,7 @@ LanguageFamily.of("ine").proto_language.name      # 'Proto-Indo-European'
 
 The catalog as plain SQL, which SQLite, PostgreSQL and MySQL all read: `languages`, `families` and
 `scripts`, with each list (a language's scripts, ancestors, aliases and varieties) a table of its own
-ordered by `position`.
+ordered by `position`, and each script's characters as `script_ranges` of first and last code points.
 
 ```bash
 ./gradlew sqlDump
@@ -100,6 +131,8 @@ sqlite3 polyglossa.sqlite < polyglossa-tools/build/sql/polyglossa.sql
 ```sql
 SELECT s.name FROM language_scripts ls JOIN scripts s ON s.code = ls.script
 WHERE ls.language = 'ar' ORDER BY ls.position;
+
+SELECT script FROM script_ranges WHERE 1046 BETWEEN first AND last;   -- U+0416, Ж: Cyrl
 ```
 
 ## One catalog, four readers
@@ -119,7 +152,8 @@ through deprecation: what a release deprecates stays until a release at least a 
 
 Polyglossa's data is a copy of what English Wiktionary's
 [`Module:JSON data`](https://en.wiktionary.org/wiki/Module:JSON_data) exports from `Module:languages`,
-`Module:etymology languages`, `Module:families` and `Module:scripts`. It is kept as tab-separated lines
+`Module:etymology languages`, `Module:families` and `Module:scripts`, with the marks of Traditional and
+Simplified Han from Unicode's Unihan. It is kept as tab-separated lines
 in [`polyglossa/data/catalog.tsv`](polyglossa/data/catalog.tsv), a language, a family or a script to a line, so a
 change to it reads as a diff, and compiled into the library.
 
@@ -145,4 +179,5 @@ Releases are made by the [Catalog workflow](.github/workflows/catalog.yml), ever
 ## Licence
 
 The code is under the MIT licence. The data is English Wiktionary's, under
-[CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/); see [NOTICE](NOTICE).
+[CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/), with the marks of Han from Unihan, under
+the [Unicode License V3](https://www.unicode.org/license.txt); see [NOTICE](NOTICE).

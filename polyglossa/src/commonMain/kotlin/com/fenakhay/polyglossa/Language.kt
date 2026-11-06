@@ -29,6 +29,7 @@ public enum class LanguageType {
  * english.scripts.first().name           // "Latin"
  * Language.of("de").varieties.map { it.name }    // [Alsatian German, American German, …]
  * Language.of("en-ear").full.name      // "English"
+ * Language.of("sh").detectScript("Москва")      // Cyrillic (Cyrl)
  * ```
  *
  * The links, [family], [ancestors], [parent] and [full], lead to the languages and families of the [Catalog]
@@ -97,6 +98,41 @@ internal constructor(
             }
             return language
         }
+
+    /**
+     * The script [text] is written in, among this language's [scripts], as Wiktionary's `findBestScript`
+     * finds it, or `null` when none of them has any of its characters.
+     *
+     * Spaces and ASCII punctuation are left out, and the scripts are tried in order: the first that has every
+     * character wins, or else the one with the most of them, the earlier on a tie. Chinese and the other
+     * languages written in Han give Traditional or Simplified Han when more of the characters mark one than
+     * the other, as Unihan tells them apart, and Han when as many mark each. A language written in every
+     * script, as Translingual is, finds it as [Catalog.detectScript] does, and an etymology-only variety with
+     * no scripts of its own uses its language's. Pass plain text: wiki markup counts as characters.
+     *
+     * ```
+     * Language.of("sh").detectScript("Москва")     // Cyrillic (Cyrl)
+     * Language.of("zh").detectScript("語言")        // Traditional Han (Hant)
+     * Language.of("ja").detectScript("ひらがな")    // Japanese (Jpan)
+     * Language.of("en").detectScript("123")        // null
+     * ```
+     */
+    public fun detectScript(text: String): Script? = links.detectScript(this, text)
+
+    /** A copy for another catalog, linked to nothing yet. */
+    internal fun copy(): Language =
+        Language(
+            code,
+            name,
+            type,
+            wikidata,
+            familyCode,
+            scriptCodes,
+            ancestorCodes,
+            aliases,
+            parentCode,
+            varieties,
+        )
 
     override fun equals(other: Any?): Boolean =
         other is Language &&
@@ -204,6 +240,10 @@ internal constructor(
     /** The languages in it directly, not those of the families under it. */
     public val languages: List<Language>
         get() = links.inFamily(code)
+
+    /** A copy for another catalog, linked to nothing yet. */
+    internal fun copy(): LanguageFamily =
+        LanguageFamily(code, name, wikidata, parentCode, protoLanguageCode, aliases)
 
     override fun equals(other: Any?): Boolean =
         other is LanguageFamily &&

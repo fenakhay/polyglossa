@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import bisect
 import enum
 import functools
 from dataclasses import dataclass, field
@@ -120,6 +121,26 @@ class Language(metaclass=_Lookup):
             seen.add(language.code)
         return language
 
+    def detect_script(self, text: str) -> Optional["Script"]:
+        """The script ``text`` is written in, among this language's :attr:`scripts`, as Wiktionary's
+        ``findBestScript`` finds it, or ``None`` when none of them has any of its characters.
+
+        Spaces and ASCII punctuation are left out, and the scripts are tried in order: the first that has every
+        character wins, or else the one with the most of them, the earlier on a tie. Chinese and the other
+        languages written in Han give Traditional or Simplified Han when more of the characters mark one than the
+        other, and Han when as many mark each. A language written in every script finds it as
+        :meth:`Catalog.detect_script` does, and an etymology-only variety with no scripts of its own uses its
+        language's. Pass plain text: wiki markup counts as characters.
+
+        >>> Language["sh"].detect_script("Москва").code
+        'Cyrl'
+        >>> Language["zh"].detect_script("語言").code
+        'Hant'
+        >>> Language["en"].detect_script("123") is None
+        True
+        """
+        return self._catalog._detection().detect_in(self, text)
+
     def __str__(self) -> str:
         return f"{self.name} ({self.code})"
 
@@ -206,6 +227,8 @@ class Script(metaclass=_Lookup):
     system: Optional[str]
     aliases: Tuple[str, ...]
     direction: ScriptDirection
+    ranges: Tuple[range, ...] = field(repr=False)
+    marks: Tuple[range, ...] = field(repr=False)
     _parent_code: Optional[str] = field(repr=False)
     _local_name_codes: Tuple[Tuple[str, str], ...] = field(repr=False)
     _catalog: "Catalog" = field(repr=False, compare=False, hash=False)
@@ -229,8 +252,28 @@ class Script(metaclass=_Lookup):
                 names[language] = local
         return names
 
+    def __contains__(self, code_point: object) -> bool:
+        """Whether ``code_point`` is one of its characters, as ``0x416 in Script.of("Cyrl")``."""
+        return isinstance(code_point, int) and _holds(self.ranges, code_point)
+
+    def count(self, text: str) -> int:
+        """How many of the characters of ``text`` are its own, counting each code point once."""
+        return sum(1 for char in text if ord(char) in self)
+
+    def _is_mark(self, code_point: int) -> bool:
+        return _holds(self.marks, code_point)
+
     def __str__(self) -> str:
         return f"{self.name} ({self.code})"
+
+    @classmethod
+    def detect(cls, text: str) -> Optional["Script"]:
+        """The script ``text`` is written in, whatever its language, or ``None``; see :meth:`Catalog.detect_script`.
+
+        >>> Script.detect("Ελληνικά").code
+        'Grek'
+        """
+        return Catalog.bundled().detect_script(text)
 
     @classmethod
     def of(cls, code: str) -> "Script":
@@ -268,6 +311,7 @@ class Catalog:
         self._languages: Dict[str, Language] = {}
         self._families: Dict[str, LanguageFamily] = {}
         self._scripts: Dict[str, Script] = {}
+        self._detector: Optional[_ScriptDetection] = None
         _read(tsv, self)
         names: Dict[str, Language] = {}
         for language in self._languages.values():
@@ -342,8 +386,180 @@ class Catalog:
         """The script called ``name``; one that is no variety of another wins over one that is."""
         return self._scripts_by_name.get(name.strip())
 
+    def detect_script(self, text: str) -> Optional[Script]:
+        """The script ``text`` is written in, whatever its language, as Wiktionary's ``findBestScriptWithoutLang``
+        finds it: the one most of its characters belong to, or ``None`` when more of them belong to no script. A
+        tie goes to a script that holds no other whole, as Greek does beside Polytonic Greek, then to a script over
+        notation such as ``Zmth``, then to the one with the most characters, as Han is beside Latin, then to one
+        that is no variety of another.
+        :meth:`Language.detect_script` knows better when the language is known.
+        """
+        return self._detection().detect(text)
+
+    def _detection(self) -> "_ScriptDetection":
+        if self._detector is None:
+            self._detector = _ScriptDetection(self._scripts)
+        return self._detector
+
     def _in_family(self, code: str) -> List[Language]:
         return list(self._by_family.get(code, []))
+
+
+_HAN = ("Hani", "Hant", "Hans")
+_HANTS = "Hants"
+_COMBINED = (("Jpan", ("Hani", "Hira", "Kana")), ("Kore", ("Hani", "Hang")))
+_PUNCTUATION = frozenset(ord(char) for char in "!\"#%&'()*,-./:;?@[\\]_{}")
+_SPACES = (range(0x9, 0xE), range(0x20, 0x21), range(0xA0, 0xA1), range(0x1680, 0x1681), range(0x2000, 0x200B),
+           range(0x2028, 0x202A), range(0x202F, 0x2030), range(0x205F, 0x2060), range(0x3000, 0x3001))
+
+
+class _ScriptDetection:
+    """How Wiktionary tells which script a text is in, as the Kotlin library does: ``Language:findBestScript``
+    in ``Module:languages`` for a language, and ``findBestScriptWithoutLang`` for none."""
+
+    def __init__(self, scripts: Dict[str, Script]) -> None:
+        combined = {code for code, _ in _COMBINED}
+        self._scripts = scripts
+        indexed = [s for s in scripts.values() if s.ranges and s.code not in combined]
+        self._sizes = {s.code: sum(len(r) for r in s.ranges) for s in indexed}
+        self._supersets = {
+            outer.code for outer in indexed
+            if any(inner.ranges != outer.ranges and _covers(outer, inner) for inner in indexed)
+        }
+        self._starts = sorted({bound for s in indexed for r in s.ranges for bound in (r.start, r.stop)})
+        index = {start: at for at, start in enumerate(self._starts)}
+        holders: List[List[Script]] = [[] for _ in self._starts]
+        for script in indexed:
+            for r in script.ranges:
+                for at in range(index[r.start], index[r.stop]):
+                    holders[at].append(script)
+        self._holders = holders
+
+    def _holding(self, code_point: int) -> List[Script]:
+        at = bisect.bisect_right(self._starts, code_point) - 1
+        return self._holders[at] if at >= 0 else []
+
+    def _size(self, script: Script) -> int:
+        if script.code in self._sizes:
+            return self._sizes[script.code]
+        parts = dict(_COMBINED).get(script.code, ())
+        return sum(self._sizes.get(part, 0) for part in parts)
+
+    def detect(self, text: str) -> Optional[Script]:
+        counts: Dict[str, int] = {}
+        combined = [0] * len(_COMBINED)
+        unmatched = 0
+        for char in text:
+            found = self._holding(ord(char))
+            if not found:
+                unmatched += 1
+            for script in found:
+                counts[script.code] = counts.get(script.code, 0) + 1
+            for at, (_, parts) in enumerate(_COMBINED):
+                if any(script.code in parts for script in found):
+                    combined[at] += 1
+        for at, (code, parts) in enumerate(_COMBINED):
+            shares = [counts.get(part, 0) for part in parts]
+            if code in self._scripts and combined[at] not in shares:
+                counts[code] = combined[at]
+        ranked = sorted(
+            ((self._scripts[code], count) for code, count in counts.items() if code in self._scripts),
+            key=lambda it: (-it[1], it[0].code in self._supersets, _is_notation(it[0]), -self._size(it[0]),
+                            it[0]._parent_code is not None, it[0].code),
+        )
+        if not ranked or ranked[0][1] < unmatched:
+            return None
+        return ranked[0][0]
+
+    def detect_in(self, language: Language, text: str) -> Optional[Script]:
+        codes = self._script_codes(language)
+        if not codes:
+            return None
+        if len(codes) >= len(self._scripts) and set(codes) >= set(self._scripts):
+            return self.detect(text)
+        points = [ord(char) for char in text if not _ignored(ord(char))]
+        if not points:
+            return None
+        best: Optional[Script] = None
+        best_count = 0
+        for code in self._groups(codes):
+            if code == _HANTS:
+                han = self._han(points)
+                if han is not None:
+                    return han
+                continue
+            script = self._scripts.get(code)
+            if script is None:
+                continue
+            count = sum(1 for point in points if point in script)
+            if count >= len(points):
+                return script
+            if count > best_count:
+                best, best_count = script, count
+        return best
+
+    @staticmethod
+    def _script_codes(language: Language) -> Tuple[str, ...]:
+        current: Optional[Language] = language
+        seen = set()
+        while current is not None and current.code not in seen:
+            seen.add(current.code)
+            if current._script_codes:
+                return current._script_codes
+            current = current.parent
+        return ()
+
+    @staticmethod
+    def _groups(codes: Tuple[str, ...]) -> List[str]:
+        groups, at = [], 0
+        while at < len(codes):
+            if tuple(codes[at:at + len(_HAN)]) == _HAN:
+                groups.append(_HANTS)
+                at += len(_HAN)
+            else:
+                groups.append(codes[at])
+                at += 1
+        return groups
+
+    def _han(self, points: List[int]) -> Optional[Script]:
+        han = self._scripts.get("Hani")
+        if han is None:
+            return None
+        traditional, simplified = self._scripts.get("Hant"), self._scripts.get("Hans")
+        marked, found = 0, False
+        for point in points:
+            if point not in han:
+                continue
+            found = True
+            is_traditional = traditional is not None and traditional._is_mark(point)
+            is_simplified = simplified is not None and simplified._is_mark(point)
+            if is_traditional != is_simplified:
+                marked += 1 if is_traditional else -1
+        if not found:
+            return None
+        if marked > 0:
+            return traditional or han
+        if marked < 0:
+            return simplified or han
+        return han
+
+
+def _is_notation(script: Script) -> bool:
+    return len(script.code) == 4 and script.code.startswith("Z")
+
+
+def _covers(outer: Script, inner: Script) -> bool:
+    return all(any(r.start <= x.start and x.stop <= r.stop for r in outer.ranges) for x in inner.ranges)
+
+
+def _ignored(code_point: int) -> bool:
+    return _holds(_SPACES, code_point) or code_point in _PUNCTUATION
+
+
+def _holds(ranges: Tuple[range, ...], code_point: int) -> bool:
+    """Whether one of ``ranges``, sorted and apart, holds ``code_point``."""
+    at = bisect.bisect_right(ranges, code_point, key=lambda r: r.start) - 1
+    return at >= 0 and code_point in ranges[at]
 
 
 _TYPES = {"": LanguageType.REGULAR, "r": LanguageType.RECONSTRUCTED, "a": LanguageType.APPENDIX_CONSTRUCTED,
@@ -432,7 +648,18 @@ def _script(cells: _Cells, catalog: Catalog) -> Script:
     for entry in _names(cells.next()):
         language, _, local_name = entry.partition("=")
         local.append((language, local_name))
-    return Script(code, name, wikidata, system, aliases, direction, parent, tuple(local), catalog)
+    ranges = _ranges(cells.next())
+    marks = _ranges(cells.next())
+    return Script(code, name, wikidata, system, aliases, direction, ranges, marks, parent, tuple(local), catalog)
+
+
+def _ranges(cell: str) -> Tuple[range, ...]:
+    """The ranges of hexadecimal code points in ``cell``, as ``41-5A,AA``."""
+    ranges = []
+    for written in _codes(cell):
+        first, _, last = written.partition("-")
+        ranges.append(range(int(first, 16), int(last or first, 16) + 1))
+    return tuple(ranges)
 
 
 def _item(cell: str) -> Optional[str]:

@@ -58,8 +58,13 @@ tasks.register("syncCatalogCopies") {
     val legal = pythonLegal
     val releaseVersion = providers.gradleProperty("releaseVersion").orElse("")
     inputs.file(source)
+    inputs.files(legal.map { it.first })
     inputs.property("releaseVersion", releaseVersion)
-    outputs.files(copies + versionFile + legal.map { it.second })
+    outputs.files(buildList {
+        addAll(copies)
+        add(versionFile)
+        legal.mapTo(this) { it.second }
+    })
     doLast {
         copies.forEach { source.asFile.copyTo(it.asFile, overwrite = true) }
         legal.forEach { it.first.asFile.copyTo(it.second.asFile, overwrite = true) }
