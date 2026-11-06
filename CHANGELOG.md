@@ -20,7 +20,7 @@ data was exported from Wiktionary, `year.month.day`; the API changes only throug
 - A weekly workflow that fetches Wiktionary's data and, only when it has changed, checks it, tags it and
   publishes the release.
 - A Swift package, `Polyglossa`, with the same types, read from the same `catalog.tsv`.
-- A Python package, `polyglossa`, for Python 3.9 and up, with the same types.
+- A Python package, `polyglossa`, for Python 3.11 and up, with the same types.
 - `sqlDump`, which writes the catalog as SQL for SQLite, PostgreSQL and MySQL.
 - `spec/expectations.json`, which the Kotlin, Swift and Python tests all check their answers against.
 

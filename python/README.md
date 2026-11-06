@@ -22,7 +22,7 @@ Script["Deva"].name_for(Language["mr"])   # 'Balbodh'
 ```
 
 `Language["xx"]` raises `UnknownLanguageError`, a `KeyError`; `Language.get("xx")` returns `None`. It
-needs Python 3.9 or later and nothing else.
+needs Python 3.11 or later and nothing else.
 
 The version is the day the data was exported from Wiktionary. The data is English Wiktionary's, under
 CC BY-SA 4.0; the code is under the MIT licence. See https://github.com/fenakhay/polyglossa.

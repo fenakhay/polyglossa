@@ -9,7 +9,7 @@ description = "English Wiktionary's languages, language families and scripts."
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE", "NOTICE"]
-requires-python = ">=3.9"
+requires-python = ">=3.11"
 authors = [{ name = "Fenakhay" }]
 keywords = ["wiktionary", "languages", "language codes", "scripts", "linguistics"]
 classifiers = [

@@ -59,7 +59,7 @@ Catalog.bundled.date                  // Optional("2026-11-05")
 
 ## Python
 
-Python 3.9 and up, with nothing but the standard library:
+Python 3.11 and up, with nothing but the standard library:
 
 ```bash
 pip install polyglossa
