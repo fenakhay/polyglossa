@@ -40,3 +40,6 @@ dependencyResolutionManagement {
 rootProject.name = "polyglossa-root"
 
 include("polyglossa", "polyglossa-tools")
+
+project(":polyglossa").projectDir = file("kotlin")
+project(":polyglossa-tools").projectDir = file("tools")

@@ -8,9 +8,10 @@ polyglossa's data is a copy of what English Wiktionary's
 variety, family and script, with their names, links and characters. The marks that tell Traditional from
 Simplified Han come from Unicode's Unihan database, version 18.0.0.
 
-It is kept in [`polyglossa/data/catalog.tsv`](https://github.com/fenakhay/polyglossa/blob/main/polyglossa/data/catalog.tsv),
+It is kept in [`data/catalog.tsv`](https://github.com/fenakhay/polyglossa/blob/main/data/catalog.tsv),
 a line to each language, family or script, so a change reads as a diff. The Kotlin library compiles it in,
-and the Swift and Python packages carry copies of it, so no reader asks the wiki for anything.
+and the Swift, Python, TypeScript, Go and Rust packages carry copies of it, so no reader asks the wiki for
+anything.
 
 ## Releases
 
@@ -24,9 +25,11 @@ runs every Thursday:
    `release` ticked, it goes on anyway, to release a change to the code that `CHANGELOG.md` lists as
    unreleased.
 3. **Check.** It runs the whole of CI against the new catalog.
-4. **Tag.** It commits the catalog with a `CHANGELOG.md` section, and tags the commit with the version.
-5. **Publish.** It publishes to Maven Central and PyPI, and makes a GitHub release with the catalog as TSV
-   and as SQL and its notes. Swift Package Manager reads the tag itself, and this site is rebuilt.
+4. **Tag.** It commits the catalog with a `CHANGELOG.md` section, and tags the commit with the version and
+   with the Go module's version.
+5. **Publish.** It publishes to Maven Central, PyPI, npm and crates.io, and makes a GitHub release with the
+   catalog as TSV and as SQL and its notes. Swift Package Manager and the Go proxy read the tags themselves,
+   and this site is rebuilt.
 
 When the data changes, the changelog says how much, and the release notes list each language, family and
 script added, removed or changed.
@@ -36,6 +39,10 @@ script added, removed or changed.
 A version is the day the data was exported, `year.month.day`: `2026.11.6` holds Wiktionary's data as it was
 on 6 November 2026. There is at most one release a day. The bundled catalog's `date` says the same at run
 time.
+
+The Go module's versions are `v1.` and the same day written whole, `v1.20261106.0`, tagged
+`go/v1.20261106.0`: Go takes a first number above 1 for a new import path, so `v2026` would change the path
+every year.
 
 The API changes only through deprecation: what a release deprecates stays until a release at least a year
 later. Taking the newest version therefore brings newer data and never breaks code that compiled, though a

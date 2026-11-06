@@ -1,7 +1,5 @@
 import org.gradle.accessors.dm.LibrariesForLibs
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
 
 plugins {
     id("polyglossa.kotlin-multiplatform-common")
@@ -29,12 +27,6 @@ kotlin {
     macosArm64()
     linuxX64()
     mingwX64()
-
-    targets.withType<KotlinNativeTarget>().configureEach {
-        binaries.matching { it.buildType == NativeBuildType.RELEASE }.configureEach {
-            binaryOption("preCodegenInlineThreshold", "40")
-        }
-    }
 
     sourceSets {
         jvmTest.dependencies {
@@ -84,4 +76,8 @@ tasks.register<Test>("jvm21Test") {
     javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(21)) })
 
     failOnNoDiscoveredTests = false
+}
+
+tasks.withType<JavaCompile>().configureEach {
+    options.release.set(21)
 }

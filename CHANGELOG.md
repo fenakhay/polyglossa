@@ -9,21 +9,41 @@ data was exported from Wiktionary, `year.month.day`; the API changes only throug
 
 ### Added
 
-- Script detection, as Wiktionary's `findBestScript` does it: `Language.detectScript(text)` among the
-  language's scripts, and `Script.detect(text)` and `Catalog.detectScript(text)` for any language. In Swift,
-  `detectScript(_:)` and `Script.detect(_:)`; in Python, `detect_script(text)` and `Script.detect(text)`.
-- `Script.ranges`, the code points of a script from `Module:scripts/data`, with `contains` and `count`, and
-  `Script.marks`, the characters that tell Traditional from Simplified Han, from Unicode 18.0.0's Unihan.
+- Script detection, matching Wiktionary's `findBestScript`. `Language.detectScript(text)` picks among the
+  language's scripts; `Script.detect(text)` and `Catalog.detectScript(text)` work for any language. Swift
+  has `detectScript(_:)` and `Script.detect(_:)`, Python `detect_script(text)` and `Script.detect(text)`.
+- `Script.ranges`, a script's code points from `Module:scripts/data`, with `contains` and `count`.
+- `Script.marks`, the characters that tell Traditional from Simplified Han, from Unicode 18.0.0's Unihan.
 - `script_ranges` and `script_marks` in the SQL dump.
-- Documentation at [docs.fenakhay.com/polyglossa](https://docs.fenakhay.com/polyglossa/), with every example
-  in Kotlin, Swift and Python and the Kotlin API reference, and a logo.
+- Documentation at [docs.fenakhay.com/polyglossa](https://docs.fenakhay.com/polyglossa/), with examples in
+  Kotlin, Java, Swift, Python, TypeScript, Go and Rust, and the Kotlin API reference.
+- A logo.
+- A TypeScript package, `polyglossa` on npm, with the same types: an ES module with no dependencies, for
+  Node 22 and up, Deno, Bun and browsers.
+- A Go module, `github.com/fenakhay/polyglossa/go`, for Go 1.23 and up. Its versions are `v1.` plus the
+  day of the data, as in `v1.20261106.0`.
+- A Rust crate, `polyglossa` on crates.io, for Rust 1.85 and up, with no dependencies.
+- Static members for Java: `Language.of`, `Language.get`, `Script.detect`, `Catalog.getBUNDLED()` and the
+  rest of the companion objects, plus the boolean getter `Language.isEtymologyOnly()`.
+
+### Changed
+
+- Each language has its own folder.
+- Swift's `Language`, `LanguageFamily` and `Script` are `Sendable` structs. `===` no longer compiles; `==`
+  works as before.
+- `Language.etymologyOnly` is now `isEtymologyOnly`, which Java sees as `isEtymologyOnly()`.
+- Swift's `Catalog.scriptNamed(_:)` is now `script(named:)`.
+- Python's languages, families and scripts compare by identity.
+- Python rejects an unknown script direction with `NotACatalogError` instead of reading it as `ltr`. The
+  error has `line` and `reason`, all errors derive from `PolyglossaError`, and the enums are `StrEnum`s.
+- Swift's `notACatalog` reason starts with the line number.
 
 ### Fixed
 
-- `family` of an etymology-only variety whose parent is another variety, such as American English, is
-  that of the nearest parent with one, here English's, instead of none.
+- An etymology-only variety whose parent is another variety, such as American English, had no `family`.
+  It now takes the family of the nearest parent that has one, here English's.
 
-## [2026.11.6] — 2026-11-06
+## [2026.11.6]
 
 ### Added
 

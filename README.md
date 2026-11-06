@@ -5,12 +5,15 @@
   </picture>
 </h1>
 
-English Wiktionary's languages, language families and scripts, for Kotlin Multiplatform, Swift and
-Python, and as SQL: every code Wiktionary uses, what it calls each one, and how they relate, built into
-the library so nothing is asked of the wiki.
+English Wiktionary's languages, language families and scripts, for Kotlin Multiplatform, Java, Swift,
+Python, TypeScript, Go and Rust, and as SQL: every code Wiktionary uses, what it calls each one, and how
+they relate, built into the library so nothing is asked of the wiki.
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.fenakhay.polyglossa/polyglossa)](https://central.sonatype.com/artifact/com.fenakhay.polyglossa/polyglossa)
 [![PyPI](https://img.shields.io/pypi/v/polyglossa)](https://pypi.org/project/polyglossa/)
+[![npm](https://img.shields.io/npm/v/polyglossa)](https://www.npmjs.com/package/polyglossa)
+[![crates.io](https://img.shields.io/crates/v/polyglossa)](https://crates.io/crates/polyglossa)
+[![Go Reference](https://pkg.go.dev/badge/github.com/fenakhay/polyglossa/go.svg)](https://pkg.go.dev/github.com/fenakhay/polyglossa/go)
 [![Kotlin](https://img.shields.io/badge/kotlin-2.5.0--Beta2-7F52FF.svg?logo=kotlin)](https://kotlinlang.org)
 [![Swift](https://img.shields.io/badge/swift-5.9%2B-F05138.svg?logo=swift)](https://docs.fenakhay.com/polyglossa/getting-started/installing/)
 [![Python](https://img.shields.io/badge/python-3.11%2B-3776AB.svg?logo=python&logoColor=white)](https://docs.fenakhay.com/polyglossa/getting-started/installing/)
@@ -47,14 +50,29 @@ dependencies {
 pip install polyglossa
 ```
 
-The Kotlin library runs on the JVM (21 and up), JavaScript and natively on macOS, Linux and Windows; the
-Swift package on macOS 12, iOS 15, tvOS 15, watchOS 8 and Linux; the Python package on Python 3.11 and up.
+```bash
+npm install polyglossa
+```
+
+```bash
+go get github.com/fenakhay/polyglossa/go
+```
+
+```bash
+cargo add polyglossa
+```
+
+The Kotlin library runs on the JVM (21 and up), where Java uses it from the same coordinates (in Maven,
+`polyglossa-jvm`), JavaScript and natively on macOS, Linux and Windows; the
+Swift package on macOS 12, iOS 15, tvOS 15, watchOS 8 and Linux; the Python package on Python 3.11 and up;
+the TypeScript package on Node 22 and up, Deno, Bun and browsers; the Go module on Go 1.23 and up;
+and the Rust crate on Rust 1.85 and up.
 Each release also has the catalog as plain SQL for SQLite, PostgreSQL and MySQL.
 
 ## Documentation
 
 The documentation is at **[docs.fenakhay.com/polyglossa](https://docs.fenakhay.com/polyglossa/)**, with
-every example in Kotlin, Swift and Python:
+every example in Kotlin, Java, Swift, Python, TypeScript, Go and Rust:
 
 - [Quick start](https://docs.fenakhay.com/polyglossa/getting-started/quick-start/) and
   [Installing](https://docs.fenakhay.com/polyglossa/getting-started/installing/)
@@ -66,7 +84,7 @@ every example in Kotlin, Swift and Python:
   [SQL](https://docs.fenakhay.com/polyglossa/guides/sql/)
 - [The data and releases](https://docs.fenakhay.com/polyglossa/reference/data-and-releases/)
 - [API reference](https://docs.fenakhay.com/polyglossa/api/) and
-  [Swift and Python](https://docs.fenakhay.com/polyglossa/reference/swift-and-python/)
+  [the other languages](https://docs.fenakhay.com/polyglossa/reference/other-platforms/)
 - [Building](https://docs.fenakhay.com/polyglossa/contributing/building/)
 
 ## Licence

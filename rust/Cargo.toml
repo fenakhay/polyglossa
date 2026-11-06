@@ -1,0 +1,26 @@
+[package]
+name = "polyglossa"
+version = "2026.11.6"
+edition = "2024"
+rust-version = "1.85"
+description = "English Wiktionary's languages, language families and scripts."
+license = "MIT"
+authors = ["Fenakhay"]
+repository = "https://github.com/fenakhay/polyglossa"
+homepage = "https://docs.fenakhay.com/polyglossa/"
+documentation = "https://docs.rs/polyglossa"
+readme = "README.md"
+keywords = ["wiktionary", "languages", "scripts", "linguistics", "iso-639"]
+categories = ["text-processing", "internationalization"]
+include = ["src/**/*.rs", "catalog.tsv", "LICENSE", "NOTICE", "README.md"]
+
+[lints.rust]
+unsafe_code = "forbid"
+missing_docs = "warn"
+
+[lints.clippy]
+all = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
+
+[dev-dependencies]
+serde_json = "1.0.145"

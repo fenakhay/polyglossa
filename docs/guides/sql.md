@@ -8,7 +8,7 @@ gh release download {{ version }} --repo fenakhay/polyglossa --pattern polygloss
 sqlite3 polyglossa.sqlite < polyglossa.sql
 ```
 
-`./gradlew sqlDump` writes the same file from a checkout, to `polyglossa-tools/build/sql/polyglossa.sql`.
+`./gradlew sqlDump` writes the same file from a checkout, to `tools/build/sql/polyglossa.sql`.
 
 ## Tables
 

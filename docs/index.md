@@ -5,9 +5,9 @@ hide:
 
 # ![polyglossa](brand/logo-dark.svg#only-light){ width="260" } ![polyglossa](brand/logo-light.svg#only-dark){ width="260" }
 
-English Wiktionary's languages, language families and scripts, for Kotlin Multiplatform, Swift, Python and
-SQL. Every code Wiktionary uses, what it calls each one and how they relate, built into the library, so
-nothing is asked of the wiki.
+English Wiktionary's languages, language families and scripts, for Kotlin Multiplatform, Java, Swift,
+Python, TypeScript, Go, Rust and SQL. Every code Wiktionary uses, what it calls each one and how they
+relate, built into the library, so nothing is asked of the wiki.
 
 ## A first look
 
@@ -22,6 +22,19 @@ nothing is asked of the wiki.
     english.ancestors.map { it.name }             // [Early Modern English]
     Language.named("Old English")?.code           // "ang"
     Language.of("sh").detectScript("Москва")      // Cyrillic (Cyrl)
+    ```
+
+=== "Java"
+
+    ```java
+    import com.fenakhay.polyglossa.Language;
+
+    Language english = Language.of("en");
+    english.getName();                                  // "English"
+    english.getFamily().getName();                      // "Anglic"
+    english.getAncestors().get(0).getName();            // "Early Modern English"
+    Language.named("Old English").getCode();            // "ang"
+    Language.of("sh").detectScript("Москва");           // Cyrillic (Cyrl)
     ```
 
 === "Swift"
@@ -50,6 +63,45 @@ nothing is asked of the wiki.
     str(Language["sh"].detect_script("Москва"))   # 'Cyrillic (Cyrl)'
     ```
 
+=== "TypeScript"
+
+    ```ts
+    import { Language } from "polyglossa";
+
+    const english = Language.of("en");
+    english.name                                       // "English"
+    english.family?.name                               // "Anglic"
+    english.ancestors.map((a) => a.name)               // ["Early Modern English"]
+    Language.named("Old English")?.code                // "ang"
+    String(Language.of("sh").detectScript("Москва"))   // "Cyrillic (Cyrl)"
+    ```
+
+=== "Go"
+
+    ```go
+    import "github.com/fenakhay/polyglossa/go"
+
+    english := polyglossa.LookupLanguage("en")
+    english.Name()                                                   // "English"
+    english.Family().Name()                                          // "Anglic"
+    english.Ancestors()[0].Name()                                    // "Early Modern English"
+    polyglossa.LanguageNamed("Old English").Code()                   // "ang"
+    polyglossa.LookupLanguage("sh").DetectScript("Москва").String()  // "Cyrillic (Cyrl)"
+    ```
+
+=== "Rust"
+
+    ```rust
+    use polyglossa::Language;
+
+    let english = Language::of("en")?;
+    english.name()                                                     // "English"
+    english.family().map(|f| f.name())                                 // Some("Anglic")
+    english.ancestors().next().map(|a| a.name())                       // Some("Early Modern English")
+    Language::named("Old English").map(|l| l.code())                   // Some("ang")
+    Language::of("sh")?.detect_script("Москва").map(|s| s.to_string())  // Some("Cyrillic (Cyrl)")
+    ```
+
 === "SQL"
 
     ```sql
@@ -67,6 +119,16 @@ nothing is asked of the wiki.
     }
     ```
 
+=== "Java"
+
+    ```xml
+    <dependency>
+        <groupId>com.fenakhay.polyglossa</groupId>
+        <artifactId>polyglossa-jvm</artifactId>
+        <version>{{ version }}</version>
+    </dependency>
+    ```
+
 === "Swift"
 
     ```swift
@@ -77,6 +139,24 @@ nothing is asked of the wiki.
 
     ```bash
     pip install polyglossa=={{ version }}
+    ```
+
+=== "TypeScript"
+
+    ```bash
+    npm install polyglossa@{{ version }}
+    ```
+
+=== "Go"
+
+    ```bash
+    go get github.com/fenakhay/polyglossa/go@{{ go_version }}
+    ```
+
+=== "Rust"
+
+    ```bash
+    cargo add polyglossa@{{ version }}
     ```
 
 === "SQL"

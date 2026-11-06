@@ -10,7 +10,7 @@ plugins {
 group = "com.fenakhay.polyglossa"
 val catalogDate =
     providers
-        .fileContents(layout.projectDirectory.file("polyglossa/data/catalog.tsv"))
+        .fileContents(layout.projectDirectory.file("data/catalog.tsv"))
         .asText
         .map { it.lineSequence().first().split('\t').getOrNull(2).orEmpty() }
 
@@ -35,27 +35,36 @@ nmcpAggregation {
 
 dependencies { nmcpAggregation(project(":polyglossa")) }
 
-val catalog = layout.projectDirectory.file("polyglossa/data/catalog.tsv")
+val catalog = layout.projectDirectory.file("data/catalog.tsv")
 val catalogCopies =
     listOf(
-        layout.projectDirectory.file("Sources/Polyglossa/Resources/catalog.tsv"),
+        layout.projectDirectory.file("swift/Sources/Polyglossa/Resources/catalog.tsv"),
         layout.projectDirectory.file("python/src/polyglossa/catalog.tsv"),
+        layout.projectDirectory.file("typescript/catalog.tsv"),
+        layout.projectDirectory.file("go/catalog.tsv"),
+        layout.projectDirectory.file("rust/catalog.tsv"),
     )
 
 val pythonVersionFile = layout.projectDirectory.file("python/src/polyglossa/_version.py")
-val pythonLegal =
-    listOf("LICENSE", "NOTICE").map { layout.projectDirectory.file(it) to layout.projectDirectory.file("python/$it") }
+val npmManifest = layout.projectDirectory.file("typescript/package.json")
+val cargoManifest = layout.projectDirectory.file("rust/Cargo.toml")
+val packageLegal =
+    listOf("python", "typescript", "go", "rust").flatMap { dir ->
+        listOf("LICENSE", "NOTICE").map { layout.projectDirectory.file("$it") to layout.projectDirectory.file("$dir/$it") }
+    }
 
 tasks.register("syncCatalogCopies") {
     group = "build"
     description =
-        "Copies polyglossa/data/catalog.tsv to the Swift and Python packages, which read their own, and gives " +
-            "the Python package the version and the licence files."
+        "Copies data/catalog.tsv to the Swift, Python, TypeScript, Go and Rust packages, which read " +
+            "their own, and gives them the version and the licence files."
 
     val source = catalog
     val copies = catalogCopies
     val versionFile = pythonVersionFile
-    val legal = pythonLegal
+    val manifest = npmManifest
+    val crate = cargoManifest
+    val legal = packageLegal
     val releaseVersion = providers.gradleProperty("releaseVersion").orElse("")
     inputs.file(source)
     inputs.files(legal.map { it.first })
@@ -63,6 +72,8 @@ tasks.register("syncCatalogCopies") {
     outputs.files(buildList {
         addAll(copies)
         add(versionFile)
+        add(manifest)
+        add(crate)
         legal.mapTo(this) { it.second }
     })
     doLast {
@@ -74,13 +85,17 @@ tasks.register("syncCatalogCopies") {
                 date.takeIf { it.size == 3 }?.joinToString(".") { it.toInt().toString() } ?: "0.0.0-SNAPSHOT"
             }
         versionFile.asFile.writeText("__version__ = \"$release\"\n")
+        val npm = manifest.asFile
+        npm.writeText(npm.readText().replaceFirst(Regex("\"version\": \"[^\"]*\""), "\"version\": \"$release\""))
+        val cargo = crate.asFile
+        cargo.writeText(cargo.readText().replaceFirst(Regex("(?m)^version = \"[^\"]*\""), "version = \"$release\""))
     }
 }
 
 val checkCatalogCopies =
     tasks.register("checkCatalogCopies") {
         group = "verification"
-        description = "Fails when the Swift or the Python package holds another catalog than the Kotlin library."
+        description = "Fails when the Swift, Python, TypeScript, Go or Rust package holds another catalog than the Kotlin library."
 
         mustRunAfter("syncCatalogCopies")
         val source = catalog
@@ -91,7 +106,7 @@ val checkCatalogCopies =
             val stale = copies.filter { !it.asFile.exists() || it.asFile.readText() != source.asFile.readText() }
             if (stale.isNotEmpty()) {
                 throw GradleException(
-                    "these copies differ from polyglossa/data/catalog.tsv: ${stale.joinToString { it.asFile.path }}; " +
+                    "these copies differ from data/catalog.tsv: ${stale.joinToString { it.asFile.path }}; " +
                         "run ./gradlew syncCatalogCopies"
                 )
             }

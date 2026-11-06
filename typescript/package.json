@@ -1,0 +1,35 @@
+{
+  "name": "polyglossa",
+  "version": "2026.11.6",
+  "description": "English Wiktionary's languages, language families and scripts.",
+  "keywords": ["wiktionary", "languages", "language codes", "scripts", "linguistics"],
+  "homepage": "https://docs.fenakhay.com/polyglossa/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fenakhay/polyglossa.git",
+    "directory": "typescript"
+  },
+  "license": "MIT",
+  "author": "Fenakhay",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist", "NOTICE"],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc -p . && node scripts/embed.js",
+    "test": "npm run build && tsc -p tsconfig.test.json && node --test"
+  },
+  "devDependencies": {
+    "typescript": "7.0.2"
+  }
+}

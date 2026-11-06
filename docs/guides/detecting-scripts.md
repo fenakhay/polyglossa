@@ -21,6 +21,20 @@ script, without asking the wiki. There are two ways to ask: in a language, which
     Language.of("en").detectScript("123")       // null
     ```
 
+=== "Java"
+
+    ```java
+    import com.fenakhay.polyglossa.Language;
+
+    Language.of("sh").detectScript("Москва");    // Cyrillic (Cyrl)
+    Language.of("sh").detectScript("Moskva");    // Latin (Latn)
+    Language.of("zh").detectScript("語言");       // Traditional Han (Hant)
+    Language.of("zh").detectScript("语言");       // Simplified Han (Hans)
+    Language.of("ja").detectScript("ひらがな");   // Japanese (Jpan)
+    Language.of("grc").detectScript("λόγος");    // Greek (Polyt), Polytonic Greek
+    Language.of("en").detectScript("123");       // null
+    ```
+
 === "Swift"
 
     ```swift
@@ -47,6 +61,48 @@ script, without asking the wiki. There are two ways to ask: in a language, which
     Language["ja"].detect_script("ひらがな").code   # 'Jpan'
     Language["grc"].detect_script("λόγος").code    # 'Polyt'
     Language["en"].detect_script("123")            # None
+    ```
+
+=== "TypeScript"
+
+    ```ts
+    import { Language } from "polyglossa";
+
+    Language.of("sh").detectScript("Москва")?.code    // "Cyrl"
+    Language.of("sh").detectScript("Moskva")?.code    // "Latn"
+    Language.of("zh").detectScript("語言")?.code       // "Hant"
+    Language.of("zh").detectScript("语言")?.code       // "Hans"
+    Language.of("ja").detectScript("ひらがな")?.code   // "Jpan"
+    Language.of("grc").detectScript("λόγος")?.code    // "Polyt"
+    Language.of("en").detectScript("123")             // null
+    ```
+
+=== "Go"
+
+    ```go
+    import "github.com/fenakhay/polyglossa/go"
+
+    polyglossa.LookupLanguage("sh").DetectScript("Москва").Code()    // "Cyrl"
+    polyglossa.LookupLanguage("sh").DetectScript("Moskva").Code()    // "Latn"
+    polyglossa.LookupLanguage("zh").DetectScript("語言").Code()       // "Hant"
+    polyglossa.LookupLanguage("zh").DetectScript("语言").Code()       // "Hans"
+    polyglossa.LookupLanguage("ja").DetectScript("ひらがな").Code()   // "Jpan"
+    polyglossa.LookupLanguage("grc").DetectScript("λόγος").Code()    // "Polyt"
+    polyglossa.LookupLanguage("en").DetectScript("123")              // nil
+    ```
+
+=== "Rust"
+
+    ```rust
+    use polyglossa::Language;
+
+    Language::of("sh")?.detect_script("Москва").map(|s| s.code())    // Some("Cyrl")
+    Language::of("sh")?.detect_script("Moskva").map(|s| s.code())    // Some("Latn")
+    Language::of("zh")?.detect_script("語言").map(|s| s.code())       // Some("Hant")
+    Language::of("zh")?.detect_script("语言").map(|s| s.code())       // Some("Hans")
+    Language::of("ja")?.detect_script("ひらがな").map(|s| s.code())   // Some("Jpan")
+    Language::of("grc")?.detect_script("λόγος").map(|s| s.code())    // Some("Polyt")
+    Language::of("en")?.detect_script("123")                         // None
     ```
 
 Only the language's own scripts are candidates:
@@ -88,6 +144,19 @@ given.
     Script.detect("ab 12345")          // null
     ```
 
+=== "Java"
+
+    ```java
+    import com.fenakhay.polyglossa.Script;
+
+    Script.detect("Ελληνικά");          // Greek (Grek)
+    Script.detect("東京");              // Han (Hani)
+    Script.detect("ひらがな漢字");      // Japanese (Jpan)
+    Script.detect("한국어");            // Hangul (Hang)
+    Script.detect("Москва 2026");       // Cyrillic (Cyrl)
+    Script.detect("ab 12345");          // null
+    ```
+
 === "Swift"
 
     ```swift
@@ -110,6 +179,45 @@ given.
     Script.detect("한국어").code       # 'Hang'
     Script.detect("Москва 2026").code  # 'Cyrl'
     Script.detect("ab 12345")          # None
+    ```
+
+=== "TypeScript"
+
+    ```ts
+    import { Script } from "polyglossa";
+
+    Script.detect("Ελληνικά")?.code      // "Grek"
+    Script.detect("東京")?.code          // "Hani"
+    Script.detect("ひらがな漢字")?.code  // "Jpan"
+    Script.detect("한국어")?.code        // "Hang"
+    Script.detect("Москва 2026")?.code   // "Cyrl"
+    Script.detect("ab 12345")            // null
+    ```
+
+=== "Go"
+
+    ```go
+    import "github.com/fenakhay/polyglossa/go"
+
+    polyglossa.DetectScript("Ελληνικά").Code()      // "Grek"
+    polyglossa.DetectScript("東京").Code()          // "Hani"
+    polyglossa.DetectScript("ひらがな漢字").Code()  // "Jpan"
+    polyglossa.DetectScript("한국어").Code()        // "Hang"
+    polyglossa.DetectScript("Москва 2026").Code()   // "Cyrl"
+    polyglossa.DetectScript("ab 12345")             // nil
+    ```
+
+=== "Rust"
+
+    ```rust
+    use polyglossa::Script;
+
+    Script::detect("Ελληνικά").map(|s| s.code())      // Some("Grek")
+    Script::detect("東京").map(|s| s.code())          // Some("Hani")
+    Script::detect("ひらがな漢字").map(|s| s.code())  // Some("Jpan")
+    Script::detect("한국어").map(|s| s.code())        // Some("Hang")
+    Script::detect("Москва 2026").map(|s| s.code())   // Some("Cyrl")
+    Script::detect("ab 12345")                        // None
     ```
 
 `Catalog.detectScript` (`detect_script` in Python) does the same with another catalog. Every character

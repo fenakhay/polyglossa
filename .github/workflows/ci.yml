@@ -48,6 +48,11 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@8da46b539cd8fe6ab27ca75128919a18d757604c
 
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
+        with:
+          path: ~/.konan
+          key: konan-${{ runner.os }}-${{ hashFiles('gradle/libs.versions.toml') }}
+
       - name: Check
         run: ./gradlew check detekt checkKotlinAbi ${{ matrix.skip }} --stacktrace
 
@@ -88,9 +93,94 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
 
-      - name: Test the Python package
+      - name: Lint, type-check and test the Python package
         working-directory: python
-        run: PYTHONPATH=src python -m unittest discover -s tests -v
+        run: |
+          python -m pip install --quiet --upgrade pip
+          python -m pip install --quiet --group dev --editable .
+          ruff check src tests
+          ruff format --check src tests
+          mypy
+          pytest
+
+  typescript:
+    name: TypeScript on Node ${{ matrix.node }}
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['22', '26']
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+        if: inputs.catalog != ''
+        with:
+          name: ${{ inputs.catalog }}
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Build and test the TypeScript package
+        working-directory: typescript
+        run: |
+          npm ci --no-audit --no-fund
+          npm test
+
+  go:
+    name: Go ${{ matrix.go }}
+    strategy:
+      fail-fast: false
+      matrix:
+        go: ['1.23', 'stable']
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+        if: inputs.catalog != ''
+        with:
+          name: ${{ inputs.catalog }}
+
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e
+        with:
+          go-version: ${{ matrix.go }}
+          cache: false
+
+      - name: Vet and test the Go module
+        working-directory: go
+        run: |
+          test -z "$(gofmt -l .)"
+          go vet ./...
+          go test ./...
+
+  rust:
+    name: Rust ${{ matrix.rust }}
+    strategy:
+      fail-fast: false
+      matrix:
+        rust: ['1.85', 'stable']
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+        if: inputs.catalog != ''
+        with:
+          name: ${{ inputs.catalog }}
+
+      - name: Install Rust ${{ matrix.rust }}
+        run: |
+          rustup toolchain install ${{ matrix.rust }} --profile minimal --component clippy,rustfmt
+          rustup default ${{ matrix.rust }}
+
+      - name: Lint and test the Rust crate
+        working-directory: rust
+        run: |
+          cargo fmt --check
+          cargo clippy --all-targets --locked -- -D warnings
+          cargo test --locked
 
   sql:
     name: SQL
@@ -113,7 +203,7 @@ jobs:
       - name: Write the catalog as SQL and load it into SQLite
         run: |
           ./gradlew sqlDump --stacktrace
-          sqlite3 polyglossa.sqlite < polyglossa-tools/build/sql/polyglossa.sql
+          sqlite3 polyglossa.sqlite < tools/build/sql/polyglossa.sql
           sqlite3 polyglossa.sqlite "SELECT name FROM languages WHERE code = 'en'" | grep -x English
 
   docs:

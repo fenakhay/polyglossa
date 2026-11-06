@@ -11,19 +11,16 @@ True
 True
 """
 
-from polyglossa._catalog import (
-    Catalog,
-    Language,
-    LanguageFamily,
-    LanguageType,
+from polyglossa._catalog import Catalog
+from polyglossa._entries import Language, LanguageFamily, Script
+from polyglossa._errors import (
     NotACatalogError,
-    Script,
-    ScriptDirection,
+    PolyglossaError,
     UnknownFamilyError,
     UnknownLanguageError,
     UnknownScriptError,
-    Variety,
 )
+from polyglossa._kinds import LanguageType, ScriptDirection, Variety
 from polyglossa._version import __version__
 
 __all__ = [
@@ -32,6 +29,7 @@ __all__ = [
     "LanguageFamily",
     "LanguageType",
     "NotACatalogError",
+    "PolyglossaError",
     "Script",
     "ScriptDirection",
     "UnknownFamilyError",

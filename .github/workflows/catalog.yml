@@ -5,7 +5,80 @@ on:
     - cron: '0 6 * * 4'
   workflow_dispatch:
     inputs:
-      release:
+      npm:
+    name: Publish to npm
+    needs: [fetch, tag]
+    runs-on: ubuntu-latest
+    environment: npm
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: refs/tags/${{ needs.fetch.outputs.version }}
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: 26
+          registry-url: https://registry.npmjs.org
+
+      - name: Build, test and publish the TypeScript package
+        working-directory: typescript
+        env:
+          VERSION: ${{ needs.fetch.outputs.version }}
+        run: |
+          test "$(node -p 'require("./package.json").version')" = "$VERSION"
+          npm ci --no-audit --no-fund
+          npm test
+          if npm view "polyglossa@$VERSION" version > /dev/null 2>&1; then
+            echo "polyglossa@$VERSION is already on npm"
+          else
+            npm publish --provenance --access public
+          fi
+
+  crates-io:
+    name: Publish to crates.io
+    needs: [fetch, tag]
+    runs-on: ubuntu-latest
+    environment: crates-io
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: refs/tags/${{ needs.fetch.outputs.version }}
+
+      - name: Test and publish the Rust crate
+        working-directory: rust
+        env:
+          VERSION: ${{ needs.fetch.outputs.version }}
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: |
+          grep -qx "version = \"$VERSION\"" Cargo.toml
+          cargo test --locked
+          if cargo info "polyglossa@$VERSION" --registry crates-io > /dev/null 2>&1; then
+            echo "polyglossa $VERSION is already on crates.io"
+          else
+            cargo publish --locked
+          fi
+
+  go-proxy:
+    name: Make the Go module known to the Go proxy
+    needs: [fetch, tag]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e
+        with:
+          go-version: stable
+          cache: false
+
+      - name: Ask the proxy for the new version
+        env:
+          VERSION: ${{ needs.fetch.outputs.version }}
+        run: |
+          GO_VERSION=$(printf 'v1.%04d%02d%02d.0' ${VERSION//./ })
+          GOPROXY=https://proxy.golang.org go list -m "github.com/fenakhay/polyglossa/go@$GO_VERSION"
+
+  release:
         description: Release even if Wiktionary's data has not changed, with what CHANGELOG.md has unreleased
         type: boolean
         default: false
@@ -58,12 +131,17 @@ jobs:
           name: catalog
           path: |
             CHANGELOG.md
-            polyglossa/data/catalog.tsv
-            Sources/Polyglossa/Resources/catalog.tsv
+            data/catalog.tsv
+            swift/Sources/Polyglossa/Resources/catalog.tsv
             python/src/polyglossa/catalog.tsv
             python/src/polyglossa/_version.py
+            typescript/catalog.tsv
+            typescript/package.json
+            go/catalog.tsv
+            rust/catalog.tsv
+            rust/Cargo.toml
             spec/expectations.json
-            polyglossa-tools/build/reports/catalog/notes.md
+            tools/build/reports/catalog/notes.md
           if-no-files-found: error
 
   check:
@@ -95,15 +173,18 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           sed -E -i "s/(polyglossa:polyglossa:|from: \")[0-9]+\.[0-9]+\.[0-9]+/\1$VERSION/" README.md
-          git add CHANGELOG.md README.md polyglossa/data/catalog.tsv Sources/Polyglossa/Resources/catalog.tsv \
-            python/src/polyglossa/catalog.tsv python/src/polyglossa/_version.py spec/expectations.json
+          git add CHANGELOG.md README.md data/catalog.tsv swift/Sources/Polyglossa/Resources/catalog.tsv \
+            python/src/polyglossa/catalog.tsv python/src/polyglossa/_version.py typescript/catalog.tsv \
+            typescript/package.json go/catalog.tsv rust/catalog.tsv rust/Cargo.toml spec/expectations.json
           if [ "$CHANGED" = true ]; then
             git commit -m "feat(catalog): record English Wiktionary's data for $VERSION"
           else
             git commit -m "chore(release): release $VERSION"
           fi
+          GO_TAG=$(printf 'go/v1.%04d%02d%02d.0' ${VERSION//./ })
           git tag "$VERSION"
-          git push --atomic origin HEAD:main "refs/tags/$VERSION"
+          git tag "$GO_TAG"
+          git push --atomic origin HEAD:main "refs/tags/$VERSION" "refs/tags/$GO_TAG"
 
   maven-central:
     name: Publish to Maven Central
@@ -121,6 +202,11 @@ jobs:
           java-version: 25
 
       - uses: gradle/actions/setup-gradle@8da46b539cd8fe6ab27ca75128919a18d757604c
+
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
+        with:
+          path: ~/.konan
+          key: konan-${{ runner.os }}-${{ hashFiles('gradle/libs.versions.toml') }}
 
       - name: Upload to the Central Portal
         env:
@@ -196,8 +282,8 @@ jobs:
           VERSION: ${{ needs.fetch.outputs.version }}
         run: |
           gh release create "$VERSION" --repo "$GITHUB_REPOSITORY" --title "$VERSION" \
-            --notes-file "$RUNNER_TEMP/catalog/polyglossa-tools/build/reports/catalog/notes.md" \
-            polyglossa/data/catalog.tsv polyglossa-tools/build/sql/polyglossa.sql
+            --notes-file "$RUNNER_TEMP/catalog/tools/build/reports/catalog/notes.md" \
+            data/catalog.tsv tools/build/sql/polyglossa.sql
 
   docs:
     name: Publish the documentation of the release

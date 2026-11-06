@@ -1,7 +1,7 @@
 polyglossa
 Copyright (c) 2026 fenakhay
 
-polyglossa/data/catalog.tsv, and the copy of it built into polyglossa, holds English Wiktionary's language,
+data/catalog.tsv, and the copies of it built into polyglossa, hold English Wiktionary's language,
 language family and script data, exported by Module:JSON data from Module:languages, Module:etymology
 languages, Module:families and Module:scripts (https://en.wiktionary.org). It is available under the
 Creative Commons Attribution-ShareAlike 4.0 License (https://creativecommons.org/licenses/by-sa/4.0/), not

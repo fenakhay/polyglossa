@@ -19,6 +19,21 @@ own as it was when the version was made, is the one `Language`, `LanguageFamily`
     catalog.languages.size              // 8970
     ```
 
+=== "Java"
+
+    ```java
+    import com.fenakhay.polyglossa.Catalog;
+
+    Catalog catalog = Catalog.getBUNDLED();
+    catalog.getDate();                      // "{{ date }}"
+    catalog.get("en");                      // English (en)
+    catalog.family("ine");                  // Indo-European (ine)
+    catalog.script("Latn");                 // Latin (Latn)
+    catalog.named("Old English");           // Old English (ang)
+    catalog.scriptNamed("Arabic");          // Arabic (Arab)
+    catalog.getLanguages().size();          // 8970
+    ```
+
 === "Swift"
 
     ```swift
@@ -30,7 +45,7 @@ own as it was when the version was made, is the one `Language`, `LanguageFamily`
     catalog.family("ine")               // Indo-European (ine)
     catalog.script("Latn")              // Latin (Latn)
     catalog.named("Old English")        // Old English (ang)
-    catalog.scriptNamed("Arabic")       // Arabic (Arab)
+    catalog.script(named: "Arabic")     // Arabic (Arab)
     catalog.languages.count             // 8970
     ```
 
@@ -49,7 +64,53 @@ own as it was when the version was made, is the one `Language`, `LanguageFamily`
     len(catalog.languages)              # 8970
     ```
 
-In Kotlin the collections are in no particular order; in Swift and Python they are sorted by code.
+=== "TypeScript"
+
+    ```ts
+    import { Catalog } from "polyglossa";
+
+    const catalog = Catalog.bundled;
+    catalog.date                          // "{{ date }}"
+    catalog.of("en").code                 // "en"; catalog.get("xx") is null
+    catalog.family("ine")?.code           // "ine"
+    catalog.script("Latn")?.code          // "Latn"
+    catalog.named("Old English")?.code    // "ang"
+    catalog.scriptNamed("Arabic")?.code   // "Arab"
+    catalog.languages.length              // 8970
+    ```
+
+=== "Go"
+
+    ```go
+    import "github.com/fenakhay/polyglossa/go"
+
+    catalog := polyglossa.Bundled()
+    catalog.Date()                         // "{{ date }}"
+    catalog.Language("en").Code()          // "en"; catalog.Language("xx") is nil
+    catalog.Family("ine").Code()           // "ine"
+    catalog.Script("Latn").Code()          // "Latn"
+    catalog.Named("Old English").Code()    // "ang"
+    catalog.ScriptNamed("Arabic").Code()   // "Arab"
+    len(catalog.Languages())               // 8970
+    ```
+
+=== "Rust"
+
+    ```rust
+    use polyglossa::Catalog;
+
+    let catalog = Catalog::bundled();
+    catalog.date()                                     // Some("{{ date }}")
+    catalog.of("en")?.code()                           // "en"; catalog.get("xx") is None
+    catalog.family("ine").map(|f| f.code())            // Some("ine")
+    catalog.script("Latn").map(|s| s.code())           // Some("Latn")
+    catalog.named("Old English").map(|l| l.code())     // Some("ang")
+    catalog.script_named("Arabic").map(|s| s.code())   // Some("Arab")
+    catalog.languages().len()                          // 8970
+    ```
+
+In Kotlin the collections are in no particular order; in the other languages they are sorted by
+code.
 
 ## The catalog as text
 
@@ -62,6 +123,14 @@ sorted by code, so two copies differ line by line where the data does. Every imp
     val text = Catalog.BUNDLED.toTsv()
     val copy = Catalog.fromTsv(text)
     copy["en"]?.family                 // Anglic (gmw-ang), from copy, not from BUNDLED
+    ```
+
+=== "Java"
+
+    ```java
+    String text = Catalog.getBUNDLED().toTsv();
+    Catalog copy = Catalog.fromTsv(text);
+    copy.get("en").getFamily();             // Anglic (gmw-ang), from copy, not from BUNDLED
     ```
 
 === "Swift"
@@ -78,6 +147,31 @@ sorted by code, so two copies differ line by line where the data does. Every imp
     text = open("catalog.tsv", encoding="utf-8").read()
     copy = Catalog(text)
     copy["en"].family.code             # 'gmw-ang', from copy
+    ```
+
+=== "TypeScript"
+
+    ```ts
+    import { readFileSync } from "node:fs";
+
+    const copy = Catalog.fromTsv(readFileSync("catalog.tsv", "utf8"));
+    copy.of("en").family?.code            // "gmw-ang", from copy
+    ```
+
+=== "Go"
+
+    ```go
+    text, err := os.ReadFile("catalog.tsv")
+    other, err := polyglossa.ParseCatalog(string(text))
+    other.Language("en").Family().Code()   // "gmw-ang", from other
+    ```
+
+=== "Rust"
+
+    ```rust
+    let text = std::fs::read_to_string("catalog.tsv")?;
+    let copy = Catalog::from_tsv(&text)?;
+    copy.of("en")?.family().map(|f| f.code())   // Some("gmw-ang"), from copy
     ```
 
 A catalog read this way is a world of its own: its languages' links lead into it, not into the bundled one.

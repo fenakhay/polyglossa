@@ -27,3 +27,33 @@ version = { attr = "polyglossa._version.__version__" }
 
 [tool.setuptools.package-data]
 polyglossa = ["catalog.tsv", "py.typed"]
+
+[dependency-groups]
+dev = ["pytest>=8.3", "pytest-cov>=6.0", "ruff>=0.8", "mypy>=1.13"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests", "src/polyglossa"]
+addopts = "-ra -q --import-mode=importlib --doctest-modules --cov=polyglossa --cov-branch --cov-fail-under=85"
+
+[tool.coverage.report]
+show_missing = true
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "B", "C4", "UP", "ARG", "SIM", "PTH", "ERA", "PL", "RUF"]
+ignore = ["PLR2004", "PLR0913"]
+dummy-variable-rgx = "^_$"
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["PLC0415"]
+"src/polyglossa/_entries.py" = ["PLC0415"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_unreachable = true
+files = ["src", "tests"]
+

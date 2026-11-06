@@ -25,7 +25,7 @@ nav = [
   ] },
   { "Reference" = [
     { "API reference" = "api/" },
-    { "Swift and Python" = "reference/swift-and-python.md" },
+    { "Other languages" = "reference/other-platforms.md" },
     { "The data and releases" = "reference/data-and-releases.md" },
     { "Changelog" = "reference/changelog.md" },
   ] },
