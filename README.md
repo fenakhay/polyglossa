@@ -125,11 +125,13 @@ Releases are made by the [Catalog workflow](.github/workflows/catalog.yml), ever
 1. It fetches Wiktionary's exports with `catalogDump`. The run fails if an export cannot be read, comes
    back as a Lua error, or loses more than a tenth of the languages, families or scripts, and nothing is
    written.
-2. If the data is what `catalog.tsv` already has, it stops there: no release.
-3. Otherwise it runs the whole of CI against the new data, then commits it with its `CHANGELOG.md`
-   section and tags the commit with the version, the day of the export.
+2. If the data is what `catalog.tsv` already has, it stops there: no release. Run by hand with `release`
+   ticked, it goes on, records the catalog dated today and releases what `CHANGELOG.md` has unreleased, such
+   as a change to the code; with nothing unreleased, the run fails.
+3. When there is a release, it runs the whole of CI against the new catalog, then commits it with its
+   `CHANGELOG.md` section and tags the commit with the version, the day of the export.
 4. From that tag it publishes to Maven Central and PyPI and makes a GitHub release with the catalog as
-   TSV and as SQL and what changed as its notes. Swift Package Manager reads the tag itself.
+   TSV and as SQL and its `CHANGELOG.md` section, with what changed in the data, as its notes. Swift Package Manager reads the tag itself.
 
 ## Licence
 

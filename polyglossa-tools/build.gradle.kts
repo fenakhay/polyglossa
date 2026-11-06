@@ -21,7 +21,7 @@ tasks.register<JavaExec>("catalogDump") {
     group = "verification"
     description =
         "Rewrites polyglossa/data/catalog.tsv from what English Wiktionary exports now, if that has changed, " +
-            "with a CHANGELOG.md section for the release it makes."
+            "with a CHANGELOG.md section for the release it makes; -Prelease releases even the same data."
 
     classpath = sourceSets["main"].runtimeClasspath
     mainClass.set(application.mainClass)
@@ -34,6 +34,7 @@ tasks.register<JavaExec>("catalogDump") {
         "--changelog",
         rootProject.layout.projectDirectory.file("CHANGELOG.md").asFile.absolutePath,
     )
+    if (providers.gradleProperty("release").isPresent) args("--release")
     providers.gradleProperty("exports").orNull?.let { args("--exports", it) }
     finalizedBy(":syncCatalogCopies")
 }

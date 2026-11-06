@@ -91,7 +91,7 @@ class CatalogToolTest {
         val dump = arrayOf("catalog.tsv", "--report", "notes.md", "--changelog", "CHANGELOG.md")
         writeOrCheck(dump, environment) shouldBe 0
         read("catalog.tsv").lines().first() shouldBe "polyglossa\t1\t2026-11-05"
-        read("github-output") shouldBe "changed=false\nversion=2026.11.5\n"
+        read("github-output") shouldBe "changed=false\nrelease=false\nversion=2026.11.5\n"
         read("CHANGELOG.md") shouldBe CHANGELOG
         directory.resolve("notes.md").exists() shouldBe false
 
@@ -99,11 +99,36 @@ class CatalogToolTest {
         directory.resolve("github-output").writeText("")
         writeOrCheck(dump, environment) shouldBe 0
         read("catalog.tsv").lines().first() shouldBe "polyglossa\t1\t2026-11-12"
-        read("github-output") shouldBe "changed=true\nversion=2026.11.12\n"
+        read("github-output") shouldBe "changed=true\nrelease=true\nversion=2026.11.12\n"
         read("notes.md") shouldContain "as exported on 2026-11-12: 0 added, 0 removed, 1 changed."
         read("notes.md") shouldContain "- `en`: name English → Anglish"
         read("summary.md") shouldContain "- `en`: name English → Anglish"
         read("CHANGELOG.md") shouldContain "## [2026.11.12] — 2026-11-12"
+    }
+
+    @Test
+    fun `a release of the same data dates the catalog today and releases the unreleased section`() {
+        directory.resolve("CHANGELOG.md").writeText(CHANGELOG)
+        writeOrCheck(arrayOf("catalog.tsv"), environment) shouldBe 0
+        directory.resolve("github-output").writeText("")
+        today = "2026-11-12"
+
+        val release =
+            arrayOf("catalog.tsv", "--release", "--report", "notes.md", "--changelog", "CHANGELOG.md")
+        writeOrCheck(release, environment) shouldBe 0
+
+        read("catalog.tsv").lines().first() shouldBe "polyglossa\t1\t2026-11-12"
+        read("github-output") shouldBe "changed=false\nrelease=true\nversion=2026.11.12\n"
+        read("CHANGELOG.md") shouldContain
+            "## [2026.11.12] — 2026-11-12\n\n### Added\n\n- Everything.\n\n[2026.11.12]:"
+        read("notes.md") shouldBe "### Added\n\n- Everything.\n"
+
+        today = "2026-11-19"
+        directory.resolve("github-output").writeText("")
+        writeOrCheck(release, environment) shouldBe 1
+        log.toString() shouldContain "has no unreleased section; there is nothing to release"
+        read("catalog.tsv").lines().first() shouldBe "polyglossa\t1\t2026-11-12"
+        read("github-output") shouldBe ""
     }
 
     @Test
@@ -155,7 +180,7 @@ class CatalogToolTest {
     @Test
     fun `after a release, the new data gets a section of its own`() {
         val released =
-            Changelog.record(CHANGELOG, "2026.11.12", "2026-11-12", "0 added, 0 removed, 1 changed")
+            Changelog.record(CHANGELOG, "2026.11.12", "2026-11-12", "0 added, 0 removed, 1 changed").orEmpty()
         Changelog.record(released, "2026.11.19", "2026-11-19", "3 added, 0 removed, 0 changed") shouldBe
             """
             # Changelog
@@ -182,6 +207,14 @@ class CatalogToolTest {
             [2026.11.12]: https://github.com/fenakhay/polyglossa/releases/tag/2026.11.12
             """
                 .trimIndent() + "\n"
+    }
+
+    @Test
+    fun `a release's section is read back without its heading`() {
+        val released = Changelog.record(CHANGELOG, "2026.11.12", "2026-11-12", null).orEmpty()
+        Changelog.section(released, "2026.11.12") shouldBe "### Added\n\n- Everything."
+        Changelog.section(released, "2027.1.1") shouldBe null
+        Changelog.record(released, "2026.11.19", "2026-11-19", null) shouldBe null
     }
 
     @Test

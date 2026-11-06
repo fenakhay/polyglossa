@@ -4,6 +4,11 @@ on:
   schedule:
     - cron: '0 6 * * 4'
   workflow_dispatch:
+    inputs:
+      release:
+        description: Release even if Wiktionary's data has not changed, with what CHANGELOG.md has unreleased
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -18,6 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       changed: ${{ steps.dump.outputs.changed }}
+      release: ${{ steps.dump.outputs.release }}
       version: ${{ steps.dump.outputs.version }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -31,20 +37,22 @@ jobs:
 
       - name: Fetch English Wiktionary's languages, families and scripts, failing if any export cannot be read
         id: dump
-        run: ./gradlew catalogDump --stacktrace
+        env:
+          RELEASE: ${{ inputs.release && '-Prelease' || '' }}
+        run: ./gradlew catalogDump $RELEASE --stacktrace
 
       - name: Refuse a version that is already released
-        if: steps.dump.outputs.changed == 'true'
+        if: steps.dump.outputs.release == 'true'
         env:
           VERSION: ${{ steps.dump.outputs.version }}
         run: |
           if git ls-remote --exit-code --tags origin "refs/tags/$VERSION" > /dev/null; then
-            echo "::error::$VERSION is already released: Wiktionary's data changed again on the day it was exported"
+            echo "::error::$VERSION is already released; there is one release a day at most, named for the day of the export"
             exit 1
           fi
 
       - name: Keep the new data
-        if: steps.dump.outputs.changed == 'true'
+        if: steps.dump.outputs.release == 'true'
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         with:
           name: catalog
@@ -61,7 +69,7 @@ jobs:
   check:
     name: Check the new data
     needs: fetch
-    if: needs.fetch.outputs.changed == 'true'
+    if: needs.fetch.outputs.release == 'true'
     uses: ./.github/workflows/ci.yml
     with:
       catalog: catalog
@@ -82,12 +90,17 @@ jobs:
       - name: Commit the data and tag the release
         env:
           VERSION: ${{ needs.fetch.outputs.version }}
+          CHANGED: ${{ needs.fetch.outputs.changed }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add CHANGELOG.md polyglossa/data/catalog.tsv Sources/Polyglossa/Resources/catalog.tsv \
             python/src/polyglossa/catalog.tsv python/src/polyglossa/_version.py spec/expectations.json
-          git commit -m "feat(catalog): record English Wiktionary's data for $VERSION"
+          if [ "$CHANGED" = true ]; then
+            git commit -m "feat(catalog): record English Wiktionary's data for $VERSION"
+          else
+            git commit -m "chore(release): release $VERSION"
+          fi
           git tag "$VERSION"
           git push --atomic origin HEAD:main "refs/tags/$VERSION"
 

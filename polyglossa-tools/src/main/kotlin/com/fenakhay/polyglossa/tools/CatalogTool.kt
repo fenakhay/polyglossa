@@ -40,11 +40,13 @@ import kotlinx.serialization.json.jsonPrimitive
  * which is left alone.
  *
  * Without `--check`, the file is rewritten only when what Wiktionary exports differs from it, so its date,
- * and so the version, moves only with the data. Then `--report <file>` gets what changed, as release notes,
- * and `--changelog <file>` a section for the new version. A fetch that fails, or one that loses more than a
- * tenth of the languages, families or scripts the file has, fails without writing anything. On GitHub
- * Actions, the step gets the outputs `changed`, `true` or `false`, and `version`, the release the file now
- * makes.
+ * and so the version, moves only with the data. Then `--report <file>` gets the release notes, and
+ * `--changelog <file>` a section for the new version. `--release` rewrites the file, dated today, even when
+ * the data is the same, to release what the changelog's unreleased section holds; it fails when there is no
+ * such section. A fetch that fails, or one that loses more than a tenth of the languages, families or scripts
+ * the file has, fails without writing anything. On GitHub Actions, the step gets the outputs `changed`,
+ * whether the data changed, `release`, whether the file was rewritten for a release, and `version`, the
+ * release the file now makes.
  */
 public fun main(args: Array<String>) {
     exitProcess(writeOrCheck(args, Environment.SYSTEM))
@@ -147,9 +149,10 @@ internal fun writeOrCheck(args: Array<String>, environment: Environment): Int {
         val kept =
             if (offline) current
             else
-                dump(target, current, named["--changelog"], environment, report).getOrElse {
-                    return failed(it.message.orEmpty(), environment, report)
-                }
+                dump(target, current, Dump(named["--changelog"], "--release" in args), environment, report)
+                    .getOrElse {
+                        return failed(it.message.orEmpty(), environment, report)
+                    }
         named["--spec"]?.let { written(environment, it, Spec.write(kept)) }
         named["--sql"]?.let { written(environment, it, Sql.write(kept)) }
         return 0
@@ -167,13 +170,22 @@ internal fun writeOrCheck(args: Array<String>, environment: Environment): Int {
 }
 
 /**
- * Records [fetched] in [target] when it differs from what [target] holds, with what changed in [report] and a
- * section in [changelog]: the catalog the file now holds, or why [fetched] was refused.
+ * How a dump records what it fetched.
+ *
+ * @property changelog the changelog to add the release to, if any.
+ * @property release whether to release even when the data is the same.
+ */
+private class Dump(val changelog: String?, val release: Boolean)
+
+/**
+ * Records [fetched] in [target] when it differs from what [target] holds, or when [dump] asks for a release,
+ * with the release notes in [report] and a section in the changelog: the catalog the file now holds, or why
+ * [fetched] was refused.
  */
 private fun dump(
     target: Path,
     fetched: Catalog,
-    changelog: String?,
+    dump: Dump,
     environment: Environment,
     report: Path?,
 ): Result<Catalog> {
@@ -183,34 +195,58 @@ private fun dump(
         return Result.failure(IllegalStateException(it))
     }
     val changed = recordedText.substringAfter('\n') != fetched.toTsv().substringAfter('\n')
-    val kept = if (changed) fetched else recorded
-    val version = calendarVersion(kept.date)
-    if (changed) {
-        target.createParentDirectories().writeText(fetched.toTsv())
-        environment.output.appendLine(
-            "wrote $target: ${fetched.languages.size} languages, ${fetched.families.size} families, " +
-                "${fetched.scripts.size} scripts, exported ${fetched.date}"
-        )
-        val changes = CatalogChanges.between(recorded, fetched)
-        val notes = changes.notes(fetched.date.orEmpty())
-        report?.createParentDirectories()?.writeText(notes)
-        environment.appendTo("GITHUB_STEP_SUMMARY", notes + "\n")
-        if (changelog != null && version != null) {
-            val file = environment.workingDirectory.resolve(changelog)
-            file.writeText(
-                Changelog.record(file.readText(), version, fetched.date.orEmpty(), changes.summary)
-            )
-            environment.output.appendLine("added $version to $file")
-        }
-    } else {
+    if (!changed && !dump.release) {
         environment.output.appendLine(
             "English Wiktionary's languages, families and scripts are as $target has them, exported " +
                 "${recorded.date}; nothing written"
         )
+        environment.appendTo(
+            "GITHUB_OUTPUT",
+            "changed=false\nrelease=false\nversion=${calendarVersion(recorded.date).orEmpty()}\n",
+        )
+        return Result.success(recorded)
     }
-    environment.appendTo("GITHUB_OUTPUT", "changed=$changed\nversion=${version.orEmpty()}\n")
-    return Result.success(kept)
+    val date = fetched.date.orEmpty()
+    val version = calendarVersion(date).orEmpty()
+    val changes = CatalogChanges.between(recorded, fetched)
+    val changelog = dump.changelog?.let(environment.workingDirectory::resolve)
+    val updated = changelog?.let {
+        Changelog.record(it.readText(), version, date, changes.summary.takeIf { changed })
+            ?: return Result.failure(
+                IllegalStateException(
+                    "Wiktionary's data is as $target has it and $it has no unreleased section; " +
+                        "there is nothing to release"
+                )
+            )
+    }
+    target.createParentDirectories().writeText(fetched.toTsv())
+    environment.output.appendLine(
+        "wrote $target: ${fetched.languages.size} languages, ${fetched.families.size} families, " +
+            "${fetched.scripts.size} scripts, exported $date"
+    )
+    if (changelog != null && updated != null) {
+        changelog.writeText(updated)
+        environment.output.appendLine("added $version to $changelog")
+    }
+    val notes =
+        releaseNotes(updated?.let { Changelog.section(it, version) }, changes.takeIf { changed }, date)
+    report?.createParentDirectories()?.writeText(notes)
+    environment.appendTo("GITHUB_STEP_SUMMARY", notes + "\n")
+    environment.appendTo("GITHUB_OUTPUT", "changed=$changed\nrelease=true\nversion=$version\n")
+    return Result.success(fetched)
 }
+
+/**
+ * The notes of a release: its [section] of the changelog, if any, then what [changes] the data brought, if it
+ * changed, as exported on [date].
+ */
+private fun releaseNotes(section: String?, changes: CatalogChanges?, date: String): String =
+    when {
+        section != null && changes != null -> section + "\n" + changes.details()
+        section != null -> section + "\n"
+        changes != null -> changes.notes(date)
+        else -> "English Wiktionary's languages, families and scripts as exported on $date, unchanged.\n"
+    }
 
 /**
  * Why [fetched] looks cut short beside [recorded], losing more than a tenth of its languages, families or
@@ -298,8 +334,11 @@ internal class CatalogChanges(
         get() = "${added.size} added, ${removed.size} removed, ${changed.size} changed"
 
     /** What changed, as the notes of the release made of an export on [date]. */
-    fun notes(date: String): String = buildString {
-        appendLine("English Wiktionary's languages, families and scripts as exported on $date: $summary.")
+    fun notes(date: String): String =
+        "English Wiktionary's languages, families and scripts as exported on $date: $summary.\n" + details()
+
+    /** Each language, family or script added, removed or changed, under a heading for each. */
+    fun details(): String = buildString {
         section("Added", added)
         section("Removed", removed)
         section("Changed", changed)

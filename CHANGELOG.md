@@ -18,7 +18,8 @@ data was exported from Wiktionary, `year.month.day`; the API changes only throug
   `catalogDump` rewrites the catalog only when the data has changed, adds the release to `CHANGELOG.md`,
   and fails without writing when an export cannot be read or comes back cut short.
 - A weekly workflow that fetches Wiktionary's data and, only when it has changed, checks it, tags it and
-  publishes the release.
+  publishes the release. Run by hand with `release`, it releases what `CHANGELOG.md` has unreleased even when
+  the data is the same.
 - A Swift package, `Polyglossa`, with the same types, read from the same `catalog.tsv`.
 - A Python package, `polyglossa`, for Python 3.11 and up, with the same types.
 - `sqlDump`, which writes the catalog as SQL for SQLite, PostgreSQL and MySQL.
