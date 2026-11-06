@@ -135,7 +135,7 @@ impl<'cat> Language<'cat> {
     }
 
     /// The languages it descends from, those the catalog knows.
-    #[must_use]
+    #[must_use = "iterators are lazy and do nothing unless consumed"]
     pub fn ancestors(self) -> impl ExactSizeIterator<Item = Language<'cat>> + DoubleEndedIterator {
         let catalog = self.0.catalog;
         self.record()
@@ -219,7 +219,7 @@ impl Language<'static> {
     }
 
     /// Every language and etymology-only variety, sorted by code.
-    #[must_use]
+    #[must_use = "iterators are lazy and do nothing unless consumed"]
     pub fn all() -> impl ExactSizeIterator<Item = Self> + DoubleEndedIterator {
         Catalog::bundled().languages()
     }

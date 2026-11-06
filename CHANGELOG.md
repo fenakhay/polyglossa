@@ -20,7 +20,7 @@ data was exported from Wiktionary, `year.month.day`; the API changes only throug
 - A logo.
 - A TypeScript package, `polyglossa` on npm, with the same types: an ES module with no dependencies, for
   Node 22 and up, Deno, Bun and browsers.
-- A Go module, `github.com/fenakhay/polyglossa/go`, for Go 1.23 and up. Its versions are `v1.` plus the
+- A Go module, `fenakhay.com/polyglossa/go`, for Go 1.23 and up. Its versions are `v1.` plus the
   day of the data, as in `v1.20261106.0`.
 - A Rust crate, `polyglossa` on crates.io, for Rust 1.85 and up, with no dependencies.
 - Static members for Java: `Language.of`, `Language.get`, `Script.detect`, `Catalog.getBUNDLED()` and the

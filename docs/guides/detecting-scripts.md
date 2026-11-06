@@ -80,7 +80,7 @@ script, without asking the wiki. There are two ways to ask: in a language, which
 === "Go"
 
     ```go
-    import "github.com/fenakhay/polyglossa/go"
+    import "fenakhay.com/polyglossa/go"
 
     polyglossa.LookupLanguage("sh").DetectScript("Москва").Code()    // "Cyrl"
     polyglossa.LookupLanguage("sh").DetectScript("Moskva").Code()    // "Latn"
@@ -197,7 +197,7 @@ given.
 === "Go"
 
     ```go
-    import "github.com/fenakhay/polyglossa/go"
+    import "fenakhay.com/polyglossa/go"
 
     polyglossa.DetectScript("Ελληνικά").Code()      // "Grek"
     polyglossa.DetectScript("東京").Code()          // "Hani"

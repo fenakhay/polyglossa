@@ -79,7 +79,7 @@ of writing system it is, the way it runs, and the characters it is made of.
 === "Go"
 
     ```go
-    import "github.com/fenakhay/polyglossa/go"
+    import "fenakhay.com/polyglossa/go"
 
     arabic := polyglossa.LookupScript("Arab")
     arabic.System()                                   // "abjad"

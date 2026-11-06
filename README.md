@@ -13,7 +13,7 @@ they relate, built into the library so nothing is asked of the wiki.
 [![PyPI](https://img.shields.io/pypi/v/polyglossa)](https://pypi.org/project/polyglossa/)
 [![npm](https://img.shields.io/npm/v/polyglossa)](https://www.npmjs.com/package/polyglossa)
 [![crates.io](https://img.shields.io/crates/v/polyglossa)](https://crates.io/crates/polyglossa)
-[![Go Reference](https://pkg.go.dev/badge/github.com/fenakhay/polyglossa/go.svg)](https://pkg.go.dev/github.com/fenakhay/polyglossa/go)
+[![Go Reference](https://pkg.go.dev/badge/fenakhay.com/polyglossa/go.svg)](https://pkg.go.dev/fenakhay.com/polyglossa/go)
 [![Kotlin](https://img.shields.io/badge/kotlin-2.5.0--Beta2-7F52FF.svg?logo=kotlin)](https://kotlinlang.org)
 [![Swift](https://img.shields.io/badge/swift-5.9%2B-F05138.svg?logo=swift)](https://docs.fenakhay.com/polyglossa/getting-started/installing/)
 [![Python](https://img.shields.io/badge/python-3.11%2B-3776AB.svg?logo=python&logoColor=white)](https://docs.fenakhay.com/polyglossa/getting-started/installing/)
@@ -55,7 +55,7 @@ npm install polyglossa
 ```
 
 ```bash
-go get github.com/fenakhay/polyglossa/go
+go get fenakhay.com/polyglossa/go
 ```
 
 ```bash

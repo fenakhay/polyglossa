@@ -89,7 +89,7 @@ Every code Wiktionary uses is there, and a lookup that may miss gives nothing in
     import (
         "fmt"
 
-        "github.com/fenakhay/polyglossa/go"
+        "fenakhay.com/polyglossa/go"
     )
 
     english := polyglossa.LookupLanguage("en")
@@ -266,7 +266,7 @@ Detection works as Wiktionary's own `findBestScript` does, from the characters e
 === "Go"
 
     ```go
-    import "github.com/fenakhay/polyglossa/go"
+    import "fenakhay.com/polyglossa/go"
 
     polyglossa.LookupLanguage("sh").DetectScript("Москва").Code()   // "Cyrl"
     polyglossa.LookupLanguage("sh").DetectScript("Moskva").Code()   // "Latn"

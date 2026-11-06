@@ -68,7 +68,7 @@ impl<'cat> LanguageFamily<'cat> {
     }
 
     /// The languages in it directly, not those of the families under it, sorted by code.
-    #[must_use]
+    #[must_use = "iterators are lazy and do nothing unless consumed"]
     pub fn languages(self) -> impl ExactSizeIterator<Item = Language<'cat>> + DoubleEndedIterator {
         let catalog = self.0.catalog;
         self.record()
@@ -95,7 +95,7 @@ impl LanguageFamily<'static> {
     }
 
     /// Every family, sorted by code.
-    #[must_use]
+    #[must_use = "iterators are lazy and do nothing unless consumed"]
     pub fn all() -> impl ExactSizeIterator<Item = Self> + DoubleEndedIterator {
         Catalog::bundled().families()
     }

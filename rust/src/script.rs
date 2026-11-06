@@ -194,7 +194,7 @@ impl Script<'static> {
     }
 
     /// Every script, sorted by code.
-    #[must_use]
+    #[must_use = "iterators are lazy and do nothing unless consumed"]
     pub fn all() -> impl ExactSizeIterator<Item = Self> + DoubleEndedIterator {
         Catalog::bundled().scripts()
     }

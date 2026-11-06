@@ -3,16 +3,16 @@
 English Wiktionary's languages, language families and scripts for Go: every code Wiktionary uses, what it
 calls each one, and how they relate, built into the module so nothing is asked of the wiki.
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/fenakhay/polyglossa/go.svg)](https://pkg.go.dev/github.com/fenakhay/polyglossa/go)
+[![Go Reference](https://pkg.go.dev/badge/fenakhay.com/polyglossa/go.svg)](https://pkg.go.dev/fenakhay.com/polyglossa/go)
 [![CI](https://github.com/fenakhay/polyglossa/actions/workflows/ci.yml/badge.svg)](https://github.com/fenakhay/polyglossa/actions/workflows/ci.yml)
 [![Docs](https://img.shields.io/badge/docs-docs.fenakhay.com%2Fpolyglossa-0A74B8.svg)](https://docs.fenakhay.com/polyglossa/)
 
 ```bash
-go get github.com/fenakhay/polyglossa/go
+go get fenakhay.com/polyglossa/go
 ```
 
 ```go
-import "github.com/fenakhay/polyglossa/go"
+import "fenakhay.com/polyglossa/go"
 
 english := polyglossa.LookupLanguage("en")
 english.Name()                                                // "English"

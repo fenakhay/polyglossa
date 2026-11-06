@@ -79,7 +79,7 @@ relate, built into the library, so nothing is asked of the wiki.
 === "Go"
 
     ```go
-    import "github.com/fenakhay/polyglossa/go"
+    import "fenakhay.com/polyglossa/go"
 
     english := polyglossa.LookupLanguage("en")
     english.Name()                                                   // "English"
@@ -150,7 +150,7 @@ relate, built into the library, so nothing is asked of the wiki.
 === "Go"
 
     ```bash
-    go get github.com/fenakhay/polyglossa/go@{{ go_version }}
+    go get fenakhay.com/polyglossa/go@{{ go_version }}
     ```
 
 === "Rust"

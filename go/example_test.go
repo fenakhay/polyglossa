@@ -3,7 +3,7 @@ package polyglossa_test
 import (
 	"fmt"
 
-	"github.com/fenakhay/polyglossa/go"
+	"fenakhay.com/polyglossa/go"
 )
 
 func ExampleLookupLanguage() {

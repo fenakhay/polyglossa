@@ -72,7 +72,7 @@ languages directly in it and to the language it descends from.
 === "Go"
 
     ```go
-    import "github.com/fenakhay/polyglossa/go"
+    import "fenakhay.com/polyglossa/go"
 
     germanic := polyglossa.LookupFamily("gmw")
     germanic.Name()                    // "West Germanic"

@@ -70,7 +70,7 @@ of them reaches the network.
     From the Go module proxy, for Go 1.23 and up, with nothing but the standard library:
 
     ```bash
-    go get github.com/fenakhay/polyglossa/go@{{ go_version }}
+    go get fenakhay.com/polyglossa/go@{{ go_version }}
     ```
 
     The package is `polyglossa`. Its versions are `v1.` and the day of the data, as `{{ go_version }}`, since Go

@@ -163,13 +163,13 @@ impl Catalog {
     }
 
     /// Every language and etymology-only variety, sorted by code.
-    #[must_use]
+    #[must_use = "iterators are lazy and do nothing unless consumed"]
     pub fn languages(&self) -> impl ExactSizeIterator<Item = Language<'_>> + DoubleEndedIterator {
         (0..self.languages.len()).map(|at| Language::new(self, LanguageId(at)))
     }
 
     /// Every family, sorted by code.
-    #[must_use]
+    #[must_use = "iterators are lazy and do nothing unless consumed"]
     pub fn families(
         &self,
     ) -> impl ExactSizeIterator<Item = LanguageFamily<'_>> + DoubleEndedIterator {
@@ -177,7 +177,7 @@ impl Catalog {
     }
 
     /// Every script, sorted by code.
-    #[must_use]
+    #[must_use = "iterators are lazy and do nothing unless consumed"]
     pub fn scripts(&self) -> impl ExactSizeIterator<Item = Script<'_>> + DoubleEndedIterator {
         (0..self.scripts.len()).map(|at| Script::new(self, ScriptId(at)))
     }

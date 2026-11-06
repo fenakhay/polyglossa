@@ -35,7 +35,7 @@ A lookup that must succeed fails with:
 
 In Swift a language, a family or a script is a `Sendable` value that points into its catalog, so a catalog
 and all it gives can be shared between tasks; two are equal when they say the same. In Go the package's
-functions are on the module `github.com/fenakhay/polyglossa/go`, imported as
+functions are on the module `fenakhay.com/polyglossa/go`, imported as
 `polyglossa`, and a missing text, such as a language without a Wikidata item, is `""`. In Rust every lookup
 gives a `Copy` handle that borrows its catalog, `Language<'static>` for the bundled one, and what a
 language, family or script leads to, such as `ancestors()` or `languages()`, comes as an iterator.

@@ -82,7 +82,7 @@ own as it was when the version was made, is the one `Language`, `LanguageFamily`
 === "Go"
 
     ```go
-    import "github.com/fenakhay/polyglossa/go"
+    import "fenakhay.com/polyglossa/go"
 
     catalog := polyglossa.Bundled()
     catalog.Date()                         // "{{ date }}"

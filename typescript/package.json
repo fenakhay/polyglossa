@@ -27,7 +27,7 @@
   },
   "scripts": {
     "build": "tsc -p . && node scripts/embed.js",
-    "test": "npm run build && tsc -p tsconfig.test.json && node --test"
+    "test": "npm run build && tsc -p tsconfig.test.json && node --test \"test/**/*.test.js\""
   },
   "devDependencies": {
     "typescript": "7.0.2"

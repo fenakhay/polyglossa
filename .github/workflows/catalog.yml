@@ -76,7 +76,7 @@ on:
           VERSION: ${{ needs.fetch.outputs.version }}
         run: |
           GO_VERSION=$(printf 'v1.%04d%02d%02d.0' ${VERSION//./ })
-          GOPROXY=https://proxy.golang.org go list -m "github.com/fenakhay/polyglossa/go@$GO_VERSION"
+          GOPROXY=https://proxy.golang.org go list -m "fenakhay.com/polyglossa/go@$GO_VERSION"
 
   release:
         description: Release even if Wiktionary's data has not changed, with what CHANGELOG.md has unreleased

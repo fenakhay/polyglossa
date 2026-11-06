@@ -8,7 +8,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/fenakhay/polyglossa/go"
+	"fenakhay.com/polyglossa/go"
 )
 
 type spec struct {
