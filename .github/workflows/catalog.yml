@@ -67,6 +67,7 @@ jobs:
             go/catalog.tsv
             rust/catalog.tsv
             rust/Cargo.toml
+            rust/Cargo.lock
             spec/expectations.json
             tools/build/reports/catalog/notes.md
           if-no-files-found: error
@@ -102,7 +103,7 @@ jobs:
           sed -E -i "s/(polyglossa:polyglossa:|from: \")[0-9]+\.[0-9]+\.[0-9]+/\1$VERSION/" README.md
           git add CHANGELOG.md README.md data/catalog.tsv swift/Sources/Polyglossa/Resources/catalog.tsv \
             python/src/polyglossa/catalog.tsv python/src/polyglossa/_version.py typescript/catalog.tsv \
-            typescript/package.json go/catalog.tsv rust/catalog.tsv rust/Cargo.toml spec/expectations.json
+            typescript/package.json go/catalog.tsv rust/catalog.tsv rust/Cargo.toml rust/Cargo.lock spec/expectations.json
           if [ "$CHANGED" = true ]; then
             git commit -m "feat(catalog): record English Wiktionary's data for $VERSION"
           else

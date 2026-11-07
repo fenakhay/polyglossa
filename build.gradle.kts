@@ -48,6 +48,7 @@ val catalogCopies =
 val pythonVersionFile = layout.projectDirectory.file("python/src/polyglossa/_version.py")
 val npmManifest = layout.projectDirectory.file("typescript/package.json")
 val cargoManifest = layout.projectDirectory.file("rust/Cargo.toml")
+val cargoLock = layout.projectDirectory.file("rust/Cargo.lock")
 val packageLegal =
     listOf("python", "typescript", "go", "rust").flatMap { dir ->
         listOf("LICENSE", "NOTICE").map { layout.projectDirectory.file("$it") to layout.projectDirectory.file("$dir/$it") }
@@ -64,6 +65,7 @@ tasks.register("syncCatalogCopies") {
     val versionFile = pythonVersionFile
     val manifest = npmManifest
     val crate = cargoManifest
+    val lock = cargoLock
     val legal = packageLegal
     val releaseVersion = providers.gradleProperty("releaseVersion").orElse("")
     inputs.file(source)
@@ -74,6 +76,7 @@ tasks.register("syncCatalogCopies") {
         add(versionFile)
         add(manifest)
         add(crate)
+        add(lock)
         legal.mapTo(this) { it.second }
     })
     doLast {
@@ -89,6 +92,10 @@ tasks.register("syncCatalogCopies") {
         npm.writeText(npm.readText().replaceFirst(Regex("\"version\": \"[^\"]*\""), "\"version\": \"$release\""))
         val cargo = crate.asFile
         cargo.writeText(cargo.readText().replaceFirst(Regex("(?m)^version = \"[^\"]*\""), "version = \"$release\""))
+        val locked = lock.asFile
+        locked.writeText(
+            locked.readText().replaceFirst(Regex("(?m)^(name = \"polyglossa\"\nversion = \")[^\"]*\""), "$1$release\"")
+        )
     }
 }
 
