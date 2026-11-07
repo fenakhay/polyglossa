@@ -38,12 +38,12 @@ Language.of("zh").detectScript("語言")         // Traditional Han (Hant)
 
 ```kotlin
 dependencies {
-    implementation("com.fenakhay.polyglossa:polyglossa:2026.11.6")
+    implementation("com.fenakhay.polyglossa:polyglossa:2026.11.7")
 }
 ```
 
 ```swift
-.package(url: "https://github.com/fenakhay/polyglossa", from: "2026.11.6")
+.package(url: "https://github.com/fenakhay/polyglossa", from: "2026.11.7")
 ```
 
 ```bash

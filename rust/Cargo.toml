@@ -1,6 +1,6 @@
 [package]
 name = "polyglossa"
-version = "2026.11.6"
+version = "2026.11.7"
 edition = "2024"
 rust-version = "1.85"
 description = "English Wiktionary's languages, language families and scripts."
