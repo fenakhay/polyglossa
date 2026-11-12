@@ -156,7 +156,7 @@ class CatalogToolTest {
     }
 
     @Test
-    fun `a release of the same data dates the catalog today and releases the unreleased section`() {
+    fun `a release of the same data releases the unreleased section, dated today, or warns of none`() {
         directory.resolve("CHANGELOG.md").writeText(CHANGELOG)
         writeOrCheck(arrayOf("catalog.tsv"), environment) shouldBe 0
         directory.resolve("github-output").writeText("")
@@ -173,10 +173,13 @@ class CatalogToolTest {
 
         today = "2026-11-19"
         directory.resolve("github-output").writeText("")
-        writeOrCheck(release, environment) shouldBe 1
-        log.toString() shouldContain "has no unreleased section; there is nothing to release"
+        writeOrCheck(release, environment) shouldBe 0
+        output.toString() shouldContain "::warning::Wiktionary's data is as "
+        output.toString() shouldContain "has no unreleased section; there is nothing to release"
+        log.toString() shouldBe ""
         read("catalog.tsv").lines().first() shouldBe "polyglossa\t1\t2026-11-12"
-        read("github-output") shouldBe ""
+        read("notes.md") shouldBe "### Added\n\n- Everything.\n"
+        read("github-output") shouldBe "changed=false\nrelease=false\nversion=2026.11.12\n"
     }
 
     @Test

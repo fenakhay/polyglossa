@@ -23,7 +23,8 @@ runs every Thursday:
    written.
 2. **Compare.** If the data is what `catalog.tsv` already holds, it stops: no release. Run by hand with
    `release` ticked, it goes on anyway, to release a change to the code that `CHANGELOG.md` lists as
-   unreleased.
+   unreleased; if `CHANGELOG.md` has no unreleased section, it stops with a warning that there is nothing
+   to release.
 3. **Check.** It runs the whole of CI against the new catalog.
 4. **Tag.** It commits the catalog with a `CHANGELOG.md` section, and tags the commit with the version and
    with the Go module's version.

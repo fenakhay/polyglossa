@@ -43,11 +43,11 @@ import kotlinx.serialization.json.jsonPrimitive
  * Without `--check`, the file is rewritten only when what Wiktionary exports differs from it, so its date,
  * and so the version, moves only with the data. Then `--report <file>` gets the release notes, and
  * `--changelog <file>` a section for the new version. `--release` rewrites the file, dated today, even when
- * the data is the same, to release what the changelog's unreleased section holds; it fails when there is no
- * such section. A fetch that fails, or one that loses more than a tenth of the languages, families or scripts
- * the file has, fails without writing anything. On GitHub Actions, the step gets the outputs `changed`,
- * whether the data changed, `release`, whether the file was rewritten for a release, and `version`, the
- * release the file now makes.
+ * the data is the same, to release what the changelog's unreleased section holds; when there is no such
+ * section, it writes nothing and warns that there is nothing to release. A fetch that fails, or one that
+ * loses more than a tenth of the languages, families or scripts the file has, fails without writing anything.
+ * On GitHub Actions, the step gets the outputs `changed`, whether the data changed, `release`, whether the
+ * file was rewritten for a release, and `version`, the release the file now makes.
  */
 public fun main(args: Array<String>) {
     exitProcess(writeOrCheck(args, Environment.SYSTEM))
@@ -203,17 +203,20 @@ private fun dump(
     truncated(recorded, fetched)?.let {
         return Result.failure(IllegalStateException(it))
     }
-    val changed = recordedText.substringAfter('\n') != fetched.toTsv().substringAfter('\n')
-    if (!changed && !dump.release) {
-        environment.output.appendLine(
-            "English Wiktionary's languages, families and scripts are as $target has them, exported " +
-                "${recorded.date}; nothing written"
-        )
+    fun kept(message: String): Result<Catalog> {
+        environment.output.appendLine(message)
         environment.appendTo(
             "GITHUB_OUTPUT",
             "changed=false\nrelease=false\nversion=${calendarVersion(recorded.date).orEmpty()}\n",
         )
         return Result.success(recorded)
+    }
+    val changed = recordedText.substringAfter('\n') != fetched.toTsv().substringAfter('\n')
+    if (!changed && !dump.release) {
+        return kept(
+            "English Wiktionary's languages, families and scripts are as $target has them, exported " +
+                "${recorded.date}; nothing written"
+        )
     }
     val date = fetched.date.orEmpty()
     val version = calendarVersion(date).orEmpty()
@@ -221,11 +224,9 @@ private fun dump(
     val changelog = dump.changelog?.let(environment.workingDirectory::resolve)
     val updated = changelog?.let {
         Changelog.record(it.readText(), version, date, changes.summary.takeIf { changed })
-            ?: return Result.failure(
-                IllegalStateException(
-                    "Wiktionary's data is as $target has it and $it has no unreleased section; " +
-                        "there is nothing to release"
-                )
+            ?: return kept(
+                "::warning::Wiktionary's data is as $target has it and $it has no unreleased section; " +
+                    "there is nothing to release"
             )
     }
     target.createParentDirectories().writeText(fetched.toTsv())
