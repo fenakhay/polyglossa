@@ -2,7 +2,7 @@ name: Catalog
 
 on:
   schedule:
-    - cron: '0 6 * * 4'
+    - cron: '23 6 * * 4'
   workflow_dispatch:
     inputs:
       release:
