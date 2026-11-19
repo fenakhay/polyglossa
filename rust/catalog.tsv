@@ -1,4 +1,4 @@
-polyglossa	1	2026-11-07
+polyglossa	1	2026-11-19
 L	aa	Afar		27811	cus-eas	Latn,Ethi		Qafar
 L	aaa	Ghotuo		35463	alv-yek	Latn		Otuo
 L	aab	Alumu-Tesu		35034	nic-alu	Latn
@@ -6360,7 +6360,7 @@ L	rmg	Traveller Norwegian		3177352	qfa-mix	Latn	rom,no
 L	rmh	Murkim		4308074	paa-lmu	Latn
 L	rmi	Lomavren		2495696	qfa-mix	Latn,Armn	pra-sau,hy
 L	rmk	Romkun		7363236	paa-tam	Latn
-L	rml	Baltic Romani		513736	inc-rom	Latn
+L	rml	Baltic Romani		513736	inc-rom	Latn,Cyrl
 L	rmm	Roma		4414831	poz-cet	Latn
 L	rmn	Balkan Romani		1256701	inc-rom	Latn
 L	rmo	Sinte Romani		1793299	inc-rom	Latn
