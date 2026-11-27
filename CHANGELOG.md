@@ -5,6 +5,12 @@ Notable changes to polyglossa, newest first.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). A version is the day the
 data was exported from Wiktionary, `year.month.day`; the API changes only through deprecation.
 
+## [2026.11.27]
+
+### Changed
+
+- English Wiktionary's languages, families and scripts as exported on 2026-11-27: 0 added, 0 removed, 2 changed.
+
 ## [2026.11.19]
 
 ### Changed
@@ -69,6 +75,7 @@ data was exported from Wiktionary, `year.month.day`; the API changes only throug
 - `sqlDump`, which writes the catalog as SQL for SQLite, PostgreSQL and MySQL.
 - `spec/expectations.json`, which the Kotlin, Swift and Python tests all check their answers against.
 
+[2026.11.27]: https://github.com/fenakhay/polyglossa/releases/tag/2026.11.27
 [2026.11.19]: https://github.com/fenakhay/polyglossa/releases/tag/2026.11.19
 [2026.11.7]: https://github.com/fenakhay/polyglossa/releases/tag/2026.11.7
 [2026.11.6]: https://github.com/fenakhay/polyglossa/releases/tag/2026.11.6

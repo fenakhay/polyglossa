@@ -1,4 +1,4 @@
-polyglossa	1	2026-11-19
+polyglossa	1	2026-11-27
 L	aa	Afar		27811	cus-eas	Latn,Ethi		Qafar
 L	aaa	Ghotuo		35463	alv-yek	Latn		Otuo
 L	aab	Alumu-Tesu		35034	nic-alu	Latn
@@ -6550,7 +6550,7 @@ L	sai-sap	Sapará		7420922	sai-car	Latn		Zapará;Zapara
 L	sai-sec	Sechura		7442912	qfa-unc	Latn
 L	sai-sin	Sinúfana		7525275	qfa-unc	Latn
 L	sai-sje-pro	Proto-Southern Jê	r	116773814	sai-sje	Latn
-L	sai-tab	Tabancale		5390321	qfa-unc	Latn
+L	sai-tab	Tabancale		12626524	qfa-unc	Latn
 L	sai-tal	Tallán		16910468	qfa-unc	Latn
 L	sai-tap	Tapayuna		30719984	sai-nje	Latn
 L	sai-tar-pro	Proto-Taranoan	r	116773816	sai-tar	Latn
@@ -8525,7 +8525,7 @@ L	xvo	Volscian		622110	itc-sbl	Ital,Latn
 L	xvs	Vestinian		2576407	itc	Ital,Latn
 L	xwa	Kwaza		3200839	qfa-unc	Latn
 L	xwc	Woccon		3569569	nai-cat	Latn
-L	xwd	Wadi Wadi		7959249
+L	xwd	Wadi Wadi		7959249	aus-pam	Latn
 L	xwe	Xwela Gbe		36887	alv-pph
 L	xwg	Kwegu		56723	sdv	Latn
 L	xwj	Wajuk		33110188
