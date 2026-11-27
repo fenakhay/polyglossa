@@ -247,12 +247,16 @@ jobs:
           go-version: stable
           cache: false
 
-      - name: Ask the proxy for the new version
+      - name: Ask the proxy for the new version, retrying for 40 minutes since it keeps a failed fetch for up to 30
         env:
           VERSION: ${{ needs.fetch.outputs.version }}
         run: |
           GO_VERSION=$(printf 'v1.%04d%02d%02d.0' ${VERSION//./ })
-          GOPROXY=https://proxy.golang.org go list -m "fenakhay.com/polyglossa/go@$GO_VERSION"
+          for attempt in 1 2 3 4 5 6 7 8 9; do
+            GOPROXY=https://proxy.golang.org go list -m "fenakhay.com/polyglossa/go@$GO_VERSION" && exit 0
+            [ "$attempt" = 9 ] || sleep 300
+          done
+          exit 1
 
   release:
     name: Publish the GitHub release
