@@ -12,6 +12,9 @@ concurrency:
   group: pages
   cancel-in-progress: false
 
+env:
+  GRADLE_OPTS: -Dorg.gradle.internal.repository.max.tentatives=6 -Dorg.gradle.internal.repository.initial.backoff=10000
+
 jobs:
   build:
     name: Build the site
